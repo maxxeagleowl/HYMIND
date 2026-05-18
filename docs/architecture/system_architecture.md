@@ -1,457 +1,458 @@
 # HYMIND System Architecture
 
-## System Purpose
+# Overview
 
-HYMIND is an autonomous Hydrogen Engineering Intelligence Agent.
+HYMIND is an autonomous hydrogen market and engineering intelligence system built around a modular multi layer architecture.
 
-The system continuously researches, analyzes, synthesizes, and distributes executive level hydrogen industry intelligence reports.
+The system combines:
 
-The platform combines external data collection, AI powered analysis, structured report generation, and optional distribution workflows.
+- LangGraph based autonomous research orchestration
+- Multi source intelligence collection
+- OpenAI powered analysis and synthesis
+- RAG based historical context retrieval
+- Reliability and validation layers
+- Optional n8n based distribution automation
 
-The core Python/LangGraph pipeline ends at Markdown report generation. Phase 6 adds the external n8n distribution layer on top of that output.
+The architecture separates:
 
-The architecture is designed for reliability, modularity, maintainability, and future extensibility.
+- Core research intelligence
+- Knowledge and retrieval systems
+- Reliability and validation
+- External report distribution
+
+This separation keeps the system maintainable, scalable, and production oriented.
 
 ---
 
 # High Level Architecture
 
 ```text
-Scheduled Trigger / Manual Input
-                ↓
-        Phase 6 n8n Distribution Layer
-                ↓
-      LangGraph Research Workflow
-                ↓
-────────────────────────────────────
-| External Data Collection Layer |
-────────────────────────────────────
-    ↓        ↓         ↓         ↓
- Serper   NewsAPI    RSS      Crawlers
-    ↓        ↓         ↓         ↓
-────────────────────────────────────
-| Content Processing Pipeline     |
-────────────────────────────────────
-    ↓ Cleaning
-    ↓ Deduplication
-    ↓ Classification
-    ↓ Relevance Filtering
-    ↓ Source Validation
-────────────────────────────────────
-| Knowledge & Context Layer       |
-────────────────────────────────────
-    ↓ Embeddings
-    ↓ Vector Storage
-    ↓ Historical Context
-────────────────────────────────────
-| AI Analysis Layer               |
-────────────────────────────────────
-    ↓ Summarization
-    ↓ Trend Analysis
-    ↓ Strategic Interpretation
-────────────────────────────────────
-| Report Generation Layer         |
-────────────────────────────────────
-    ↓ Markdown Reports
-    ↓ PDF Export
-────────────────────────────────────
-| Distribution Layer              |
-────────────────────────────────────
-    ↓ Gmail
-    ↓ Telegram
+Research Trigger
+        ↓
+LangGraph Research Workflow
+        ↓
+Multi Source Intelligence Collection
+        ↓
+Content Cleaning & Deduplication
+        ↓
+Classification & Validation
+        ↓
+RAG Context Retrieval
+        ↓
+OpenAI Analysis & Synthesis
+        ↓
+Markdown Executive Report
+        ↓
+Phase 6 Distribution Layer [Optional]
+        ↓
+PDF Generation
+        ↓
+Gmail / Telegram Delivery
+        ↓
+Delivery Logging & Archiving
 ```
 
 ---
 
-# Core Architectural Principles
+# Core System Layers
 
-The architecture prioritizes:
+# 1. Trigger Layer
 
-- reliability over complexity
-- modular components
-- deterministic workflows
-- traceable outputs
-- clear separation of responsibilities
-- maintainable code structure
-- production style organization
+The system can start through multiple trigger types.
 
----
+## Supported Triggers
 
-# Main Components
+- Manual execution
+- Scheduled execution
+- Future webhook execution
+- Future event based triggers
 
-## 1. Phase 6 n8n Distribution Layer
+## Current MVP
 
-### Responsibility
+The MVP currently supports:
 
-n8n manages orchestration and automation for external delivery only.
-
-### Responsibilities Include
-
-- scheduled execution
-- workflow triggering
-- notifications
-- execution monitoring
-- external integration coordination
-
-### Important Constraint
-
-n8n should NOT contain core business logic.
-
-Complex logic belongs inside Python services.
+- Manual Python execution
+- Scheduled workflow support prepared for n8n integration
 
 ---
 
-# 2. LangGraph Workflow Layer
+# 2. Research Collection Layer
 
-### Responsibility
+The research layer gathers intelligence from multiple external sources.
 
-LangGraph orchestrates workflow state and reasoning flow.
+## APIs
 
-### Responsibilities Include
+### Serper API
 
-- workflow routing
-- state management
-- tool orchestration
-- execution sequencing
-- conditional flow handling
+Used for:
 
-### Important Constraint
+- Google search based intelligence gathering
+- Competitor research
+- Market developments
+- Technical announcements
 
-LangGraph coordinates workflows but should not contain large monolithic business logic implementations.
+### NewsAPI
 
----
+Used for:
 
-# 3. Research Collection Layer
+- Structured news aggregation
+- Industry news monitoring
+- Political developments
+- Funding announcements
 
-### Responsibility
+### Alpha Vantage
 
-Collect external industry intelligence.
+Used for:
 
-### Data Sources
-
-- Serper API
-- NewsAPI
-- RSS feeds
-- controlled website crawling
-- government publications
-- company press releases
-
-### Goals
-
-- collect relevant information
-- preserve source traceability
-- normalize heterogeneous sources
+- Financial intelligence
+- Public company monitoring
+- Market related analysis
 
 ---
 
-# 4. Content Processing Pipeline
+## RSS Feed Collection
 
-### Responsibility
+RSS feeds are used because many hydrogen industry platforms do not expose APIs.
 
-Transform raw collected content into structured research data.
+### Example Sources
 
-### Processing Steps
-
-- text cleaning
-- duplicate removal
-- language normalization
-- relevance scoring
-- category classification
-- source validation
-
-### Output
-
-Structured research objects ready for analysis and storage.
+- Hydrogen Insight
+- Fuel Cells Works
+- H2 View
+- Government hydrogen programs
+- Energy research institutions
 
 ---
 
-# 5. Knowledge & Context Layer
+## Website Crawling
 
-### Responsibility
+Controlled crawling is used for:
 
-Provide historical context and retrieval augmentation.
+- Press releases
+- Strategy documents
+- Technical publications
+- Research announcements
+- Funding information
 
 ### Technologies
 
-- ChromaDB
-or
-- Pinecone
-
-### Responsibilities Include
-
-- vector storage
-- semantic retrieval
-- historical trend comparison
-- contextual memory support
-
-### Important Constraint
-
-RAG augments intelligence generation but does not replace structured workflows.
+- BeautifulSoup
+- Requests
+- Playwright [future option]
 
 ---
 
-# 6. AI Analysis Layer
+# 3. Processing & Validation Layer
 
-### Responsibility
+Collected content is normalized and validated before analysis.
 
-Generate intelligence from processed research data.
+## Responsibilities
 
-### LLM Responsibilities
+- Content cleaning
+- HTML removal
+- Deduplication
+- Schema normalization
+- Validation
+- Relevance filtering
+- Metadata extraction
 
-- summarization
-- trend analysis
-- executive synthesis
-- strategic interpretation
-- signal extraction
+---
 
-### Design Principle
+# 4. RAG & Knowledge Layer
 
-AI should synthesize validated information rather than generate unsupported assumptions.
+The RAG layer stores and retrieves historical intelligence.
+
+## Purpose
+
+The retrieval system improves:
+
+- Historical awareness
+- Trend analysis
+- Context retention
+- Long term intelligence quality
+- Report consistency
+
+---
+
+## Current Implementation
+
+### Vector Database
+
+- Pinecone
+
+### Embeddings
+
+- OpenAI embeddings
+
+### Stored Data
+
+- Research findings
+- Summaries
+- Metadata
+- Source references
+- Historical context
+
+---
+
+# 5. LangGraph Orchestration Layer
+
+LangGraph coordinates the autonomous workflow.
+
+## Responsibilities
+
+- State management
+- Workflow routing
+- Tool orchestration
+- Validation handling
+- Retry handling
+- Context propagation
+- Multi step execution
+
+---
+
+## Current Workflow
+
+```text
+Research Input
+    ↓
+Source Collection
+    ↓
+Normalization
+    ↓
+Deduplication
+    ↓
+Validation
+    ↓
+RAG Retrieval
+    ↓
+OpenAI Synthesis
+    ↓
+Report Generation
+```
+
+---
+
+# 6. OpenAI Analysis Layer
+
+OpenAI performs the reasoning and synthesis tasks.
+
+## Responsibilities
+
+- Summarization
+- Strategic analysis
+- Trend interpretation
+- Executive synthesis
+- Report generation
+- Context aware reasoning
 
 ---
 
 # 7. Report Generation Layer
 
-### Responsibility
+The system generates structured Markdown reports.
 
-Transform AI outputs into structured executive reports.
+## Current Output
 
-### Report Types
-
-- weekly executive reports
-- competitor updates
-- funding alerts
-- technology trend reports
-- strategic alerts
-
-### Output Formats
-
-- Markdown
-
-### Report Requirements
-
-Reports must:
-
-- remain executive readable
-- separate facts from interpretation
-- preserve source traceability
-- avoid generic AI wording
+- Markdown executive reports
+- Structured report sections
+- Source linked findings
+- Strategic summaries
 
 ---
 
-# 8. Phase 6 Distribution Layer
+## Planned Report Types
 
-### Responsibility
-
-Deliver generated intelligence to stakeholders.
-
-### Delivery Channels
-
-- Gmail
-- Telegram
-- local file export
-
-### Future Expansion
-
-Potential future channels:
-
-- Microsoft Teams
-- SharePoint
-- Slack
-- dashboard integrations
+- Weekly executive reports
+- Competitor intelligence reports
+- Technology trend reports
+- Funding and policy reports
+- Strategic alerts
 
 ---
 
-# Workflow Pipeline
+# 8. Reliability & Hardening Layer
 
-## Step 1. Trigger
+This layer improves operational stability and production readiness.
 
-Workflow starts via:
+## Responsibilities
 
-- scheduled execution
-- manual execution
-- event based trigger
-
----
-
-## Step 2. Data Collection
-
-The system gathers information from:
-
-- APIs
-- RSS feeds
-- web searches
-- crawled websites
+- Retry logic
+- Error handling
+- API validation
+- Schema validation
+- Fallback handling
+- Logging
+- Failure isolation
+- Rate limit handling
 
 ---
 
-## Step 3. Content Processing
+## Goal
 
-Collected data is:
-
-- cleaned
-- normalized
-- deduplicated
-- categorized
-- validated
+Ensure the autonomous workflow operates reliably without manual intervention.
 
 ---
 
-## Step 4. Knowledge Storage
+# 9. Phase 6 Distribution Layer
 
-Relevant information is embedded and stored for retrieval.
+The distribution layer is intentionally separated from the core intelligence pipeline.
 
----
-
-## Step 5. AI Analysis
-
-The LLM analyzes collected intelligence and generates structured findings.
+This layer is optional for the MVP core workflow and focuses on external delivery automation.
 
 ---
 
-## Step 6. Report Generation
+## Responsibilities
 
-The system generates executive level reports.
-
----
-
-## Step 7. Distribution
-
-Reports are distributed automatically.
-
----
-
-# State Management
-
-## Persistent State
-
-Project continuity is maintained through:
-
-- docs/project_state.md
-- docs/decision_log.md
-- docs/operations/progress_log.md
-- memory/active/latest_context.md
-- memory/active/current_focus.md
-- memory/active/active_risks.md
+- n8n orchestration
+- Markdown report loading
+- PDF generation
+- Gmail delivery
+- Telegram notifications
+- Delivery logging
+- Report archiving
 
 ---
 
-# Session Continuity Principle
-
-The repository itself acts as the persistent memory layer.
-
-The system should never rely on hidden chat context for continuity.
-
----
-
-# Error Handling Strategy
-
-Every external integration must support:
-
-- response validation
-- timeout handling
-- retry logic
-- graceful failure handling
-- structured logging
-
----
-
-# Reliability Strategy
-
-The system prioritizes:
-
-- stable execution
-- reproducible workflows
-- deterministic outputs where possible
-- transparent failures
-- recoverable workflows
-
----
-
-# Repository Structure Philosophy
-
-The repository should remain:
-
-- modular
-- readable
-- maintainable
-- production oriented
-
-Core logic belongs inside:
+## Example Workflow
 
 ```text
-src/
-```
-
-Reusable workflows belong inside:
-
-```text
-skills/
-```
-
-Architecture documentation belongs inside:
-
-```text
-docs/architecture/
+Markdown Report
+    ↓
+n8n Trigger
+    ↓
+PDF Generation
+    ↓
+Gmail Delivery
+    ↓
+Telegram Alert
+    ↓
+Delivery Logging
 ```
 
 ---
 
-# MVP Boundaries
+# Repository Structure
 
-## Included In MVP
+```text
+HYMIND/
+│
+├── src/
+│   ├── hymind/
+│   │   ├── collectors/
+│   │   ├── rag/
+│   │   ├── reporting/
+│   │   ├── workflows/
+│   │   ├── tools/
+│   │   └── validation/
+│
+├── docs/
+│   ├── architecture/
+│   ├── operations/
+│   ├── roadmap/
+│   └── stories.md
+│
+├── memory/
+│   └── active/
+│
+├── skills/
+│
+├── tests/
+│
+├── outputs/
+│
+├── AGENTS.md
+├── README.md
+├── requirements.txt
+└── .env.example
+```
 
-- hydrogen industry focus
-- weekly report generation
-- basic alerting
-- multiple external data sources
-- basic RAG
+---
+
+# Architectural Design Decisions
+
+# Why LangGraph
+
+LangGraph was selected because:
+
+- Multi step workflows are required
+- State handling is important
+- Tool orchestration is easier
+- Validation and retries are easier to control
+- Future autonomous routing is supported
+
+---
+
+# Why RAG
+
+RAG was selected because:
+
+- Historical context matters
+- Trend analysis requires memory
+- Long term intelligence improves report quality
+- Repeated information can be reused efficiently
+
+---
+
+# Why n8n
+
+n8n was selected because:
+
+- Excellent workflow orchestration
+- Reliable scheduling
+- Easy external integrations
+- Strong automation ecosystem
+- Good fit for report distribution workflows
+
+---
+
+# Current MVP Scope
+
+The MVP currently includes:
+
+- Hydrogen industry intelligence
+- Multi source research
 - LangGraph orchestration
-- Markdown reporting
-- Phase 6 distribution automation
+- OpenAI analysis
+- Pinecone RAG
+- Markdown report generation
+- Reliability features
+- Structured testing
 
 ---
 
-## Excluded From MVP
+# Future Extensions
 
-- multi industry support
-- real time dashboards
-- predictive forecasting
-- advanced financial analytics
-- enterprise scale deployment
-- distributed infrastructure
+Possible future improvements:
 
----
-
-# Future Architecture Extensions
-
-Potential future extensions include:
-
-- SharePoint integration
 - Microsoft Teams integration
-- multi agent architecture
-- semantic patent analysis
-- real time event streaming
-- cloud deployment
-- dashboard systems
-- internal document intelligence
-- competitor scoring systems
+- SharePoint integration
+- LinkedIn monitoring
+- Real time dashboards
+- Human approval workflows
+- Multi company comparison
+- Predictive intelligence
+- Internal enterprise knowledge integration
+- Automated briefing generation
+- Multi language support
 
 ---
 
-# Architectural Decision Philosophy
+# Architectural Philosophy
 
-When making architectural decisions prioritize:
+HYMIND follows a layered architecture philosophy.
 
-1. stability
-2. simplicity
-3. maintainability
-4. modularity
-5. scalability
-6. performance optimization
+The system intentionally separates:
 
----
+- Intelligence gathering
+- Knowledge retrieval
+- Analysis and reasoning
+- Reliability handling
+- Distribution automation
 
-# Long Term Vision
+This separation improves:
 
-HYMIND is designed to evolve into a production capable autonomous intelligence platform for hydrogen engineering, market monitoring, and strategic industry analysis.
+- Maintainability
+- Scalability
+- Reliability
+- Testability
+- Future extensibility
