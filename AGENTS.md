@@ -1,3 +1,7 @@
+# Runtime Notice
+
+Read CLAUDE.md before starting any session work.
+
 # HYMIND Agent Instructions
 
 ## Project Identity

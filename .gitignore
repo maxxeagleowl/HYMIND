@@ -11,3 +11,5 @@ project_brief.md
 project_deliverables.md
 project_planning.md
 .gitignore
+docs/constraints/data_governance.md
+docs/constraints/engineering_constraints.md
