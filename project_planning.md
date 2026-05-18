@@ -1,6 +1,6 @@
 # Day 1
 ## Research, Scope & Sprint Plan
-Choose target industry and use case• Define research objectives and report structure• Choose your agent/workflow approach and justify it• Identify at least 2 real tools/APIs• Create user stories and sprint tasks in docs/stories.md, GitHub Issues, Asana, or Jira• Add task estimates, dependencies, and definitions of done• Set up repository, environment, and API accounts
+Choose target industry and use case• Define research objectives and report structure• Choose your agent/workflow approach and justify it• Identify at least 2 real tools/APIs• Create user stories and sprint tasks in docs/planning/stories.md, GitHub Issues, Asana, or Jira• Add task estimates, dependencies, and definitions of done• Set up repository, environment, and API accounts
 
 # Day 2	
 ## Research Foundation & First Integration
@@ -17,6 +17,6 @@ Check each agent-supported task against its definition of done• Fix bugs and e
 
 # Day 5
 ## Final Polish & Presentation
-Complete README and documentation• Create architecture or workflow diagrams• Confirm docs/stories.md or planning board is linked and complete• Confirm project specification, AGENTS.md files, and skills/ are included
+Complete README and documentation• Create architecture or workflow diagrams• Confirm docs/planning/stories.md or planning board is linked and complete• Confirm project specification, AGENTS.md files, and skills/ are included
 Run final end-to-end tests• Prepare demo video or presentation
 Submit project repository 

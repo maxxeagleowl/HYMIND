@@ -20,7 +20,16 @@ requirements.txt
 .env.example
 AGENTS.md
 docs/
+  architecture/
+  roadmap/
+  operations/
+  operations/reporting_standards.md
+  planning/
+  project_state.md
+  decision_log.md
 skills/
+  governance/
+  operational/
 src/
 config/
 reports/
@@ -32,7 +41,7 @@ n8n/
 
 - Project skeleton created
 - Minimal dependencies defined
-- Initial planning and architecture docs added
+- Initial planning, architecture, and operational docs added
 - Reusable skill stubs added
 
 ## Next Phases

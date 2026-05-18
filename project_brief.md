@@ -38,7 +38,7 @@ Agent/workflow framework: LangChain, LangGraph, n8n, or another appropriate fram
 Tool/API integration: At least two real tools or APIs
 LLM: OpenAI, Anthropic, or similar provider
 Version Control: Git/GitHub
-Agile planning documentation: docs/stories.md at minimum, or linked GitHub Issues, Asana, or Jira board
+Agile planning documentation: docs/planning/stories.md at minimum, or linked GitHub Issues, Asana, or Jira board
 Optional Tools
 Vector database or retrieval layer: Pinecone, Chroma, FAISS, or another option if your use case benefits from RAG
 MCP: Recommended when it helps standardize reusable tool integrations, but not required for every project
@@ -101,7 +101,7 @@ Requirements.txt with all dependencies
 Proper project structure following recommended layout
 Commit history showing development progress
 Architecture diagrams and workflow documentation
-docs/stories.md or links to GitHub Issues, Asana, or Jira showing user stories, sprint tasks, estimates, dependencies, and definitions of done
+docs/planning/stories.md or links to GitHub Issues, Asana, or Jira showing user stories, sprint tasks, estimates, dependencies, and definitions of done
 skills/ directory containing the skills used or created for the project
 Project specification written for the agent and every AGENTS.md file created during development
 Working autonomous agent (Python code, n8n workflow, or justified hybrid)
@@ -140,7 +140,7 @@ Research what information would be valuable for that industry
 Identify at least 2 APIs or tools you'll need (web search, data analysis, document processing, etc.)
 Define what a "comprehensive report" means for your industry
 Write user stories and sprint tasks in
-docs/stories.md
+docs/planning/stories.md
 , GitHub Issues, Asana, or Jira
 Add estimates, dependencies, and a definition of done for each task
 Set up your environment:

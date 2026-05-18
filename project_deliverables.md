@@ -20,7 +20,7 @@ A clear explanation of why you chose your framework or workflow approach
 Error handling, retry logic, and validation for tool/API interactions
 Optional advanced components if useful for your use case, such as RAG, MCP, LangGraph state routing, or n8n orchestration
 3. Agile Planning Artifacts
-Organize the project using Agile user stories and a sprint plan. At minimum, include docs/stories.md in your repository. GitHub Issues, Asana, or Jira are also valid if you link them clearly from the README.md.
+Organize the project using Agile user stories and a sprint plan. At minimum, include docs/planning/stories.md in your repository. GitHub Issues, Asana, or Jira are also valid if you link them clearly from the README.md.
 
 Your planning artifacts must include:
 

@@ -223,20 +223,21 @@ Preferred documentation structure:
 
 ```text
 docs/
-├── architecture.md
-├── workflow.md
-├── api_integrations.md
-├── limitations.md
-├── project_phases.md
-├── stories.md
-├── sprint_plan.md
-├── task_board.md
-├── definition_of_done.md
+├── architecture/architecture.md
+├── architecture/workflow.md
+├── architecture/api_integrations.md
+├── operations/limitations.md
+ﾃ｢窶敘禿｢窶昶ぎﾃ｢窶昶ぎ operations/reporting_standards.md
+├── roadmap/project_phases.md
+├── planning/stories.md
+├── roadmap/sprint_plan.md
+├── operations/task_board.md
+├── operations/definition_of_done.md
 ├── project_state.md
 ├── decision_log.md
-├── progress_log.md
-├── next_actions.md
-└── open_questions.md
+├── operations/progress_log.md
+├── roadmap/next_actions.md
+└── operations/open_questions.md
 ```
 
 ---

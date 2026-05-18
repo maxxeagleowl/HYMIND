@@ -11,7 +11,7 @@ Build an autonomous hydrogen engineering and market intelligence agent that gath
 | US-01 | As a developer, I want a clean repository structure so that future agent work is easy to organize. | 1 | None | Required folders and baseline files exist and are documented. |
 | US-02 | As a developer, I want a minimal dependency list so that setup is fast and understandable. | 1 | None | `requirements.txt` contains only the packages needed for the next phase. |
 | US-03 | As a developer, I want a safe `.env.example` so that local configuration is easy without exposing secrets. | 1 | None | All required config keys are listed with empty placeholders or safe defaults. |
-| US-04 | As a developer, I want reusable skill files so that future Codex work follows the same project conventions. | 1 | None | `skills/` contains short, practical guidance files. |
+| US-04 | As a developer, I want reusable skill files so that future Codex work follows the same project conventions. | 1 | None | `skills/governance/` and `skills/operational/` contain short, practical guidance files. |
 | US-05 | As a developer, I want initial docs for architecture, workflow, integrations, limitations, and implementation phases so that the next phase starts from a shared baseline. | 2 | US-01 | The docs exist and describe the intended system at a high level. |
 
 ## Initial Sprint Tasks

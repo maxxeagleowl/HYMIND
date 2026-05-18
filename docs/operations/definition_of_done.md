@@ -2,18 +2,23 @@
 
 ## General Definition of Done
 
-A task is considered complete when:
+A task is only considered complete if:
 
-- The implementation works without runtime errors
-- The feature is tested manually
-- The code follows the project structure
-- Environment variables are externalized
-- Logging is implemented where necessary
-- Error handling is included
-- The functionality is documented
-- The code is committed to GitHub
-- No secrets are exposed
-- Dependencies are documented
+- Functionality implemented
+- Validation added
+- Error handling added
+- Retry logic added
+- Timeout handling added
+- Logging implemented
+- Manual testing completed
+- Documentation updated
+- Memory updated
+- No hardcoded secrets
+- Graceful failure behavior verified
+- Existing functionality remains operational
+- Outputs follow project formatting standards
+- Relevant decisions documented
+- Definition of done reviewed before closure
 
 ---
 

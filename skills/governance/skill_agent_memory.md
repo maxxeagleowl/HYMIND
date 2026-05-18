@@ -56,9 +56,9 @@ The following project state files must exist:
 docs/
 ├── project_state.md
 ├── decision_log.md
-├── open_questions.md
-├── progress_log.md
-└── next_actions.md
+├── operations/open_questions.md
+├── operations/progress_log.md
+└── roadmap/next_actions.md
 ```
 
 ---
@@ -151,7 +151,7 @@ All major engineering decisions must be documented.
 
 ---
 
-## open_questions.md
+## operations/open_questions.md
 
 Contains:
 
@@ -164,7 +164,7 @@ This file prevents unresolved topics from being forgotten.
 
 ---
 
-## progress_log.md
+## operations/progress_log.md
 
 Contains:
 
@@ -178,7 +178,7 @@ This file acts as a development timeline.
 
 ---
 
-## next_actions.md
+## roadmap/next_actions.md
 
 Contains:
 
@@ -200,7 +200,7 @@ Before implementation begins, Codex must read:
 ```text
 AGENTS.md
 docs/project_state.md
-docs/task_board.md
+docs/operations/task_board.md
 docs/decision_log.md
 memory/handover.md
 ```
@@ -223,9 +223,9 @@ Implementation must not begin before context review is completed.
 During implementation, Codex must update:
 
 ```text
-docs/progress_log.md
+docs/operations/progress_log.md
 docs/decision_log.md
-docs/task_board.md
+docs/operations/task_board.md
 ```
 
 when meaningful progress occurs.

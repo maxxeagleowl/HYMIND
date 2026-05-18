@@ -40,19 +40,19 @@ The following Agile planning files must exist:
 
 ```text
 docs/
-├── stories.md
-├── sprint_plan.md
-├── task_board.md
-├── definition_of_done.md
-├── progress_log.md
-└── next_actions.md
+├── planning/stories.md
+├── roadmap/sprint_plan.md
+├── operations/task_board.md
+├── operations/definition_of_done.md
+├── operations/progress_log.md
+└── roadmap/next_actions.md
 ```
 
 ---
 
 # Planning Responsibilities
 
-## stories.md
+## planning/stories.md
 
 Contains:
 
@@ -67,7 +67,7 @@ This file acts as the primary project planning document.
 
 ---
 
-## sprint_plan.md
+## roadmap/sprint_plan.md
 
 Contains:
 
@@ -81,7 +81,7 @@ Sprint planning must remain realistic and implementation focused.
 
 ---
 
-## task_board.md
+## operations/task_board.md
 
 Contains:
 
@@ -96,7 +96,7 @@ The task board represents the operational execution state.
 
 ---
 
-## definition_of_done.md
+## operations/definition_of_done.md
 
 Contains:
 
@@ -110,7 +110,7 @@ A task is not complete until its definition of done is satisfied.
 
 ---
 
-## progress_log.md
+## operations/progress_log.md
 
 Contains:
 
@@ -124,7 +124,7 @@ This file acts as the historical execution timeline.
 
 ---
 
-## next_actions.md
+## roadmap/next_actions.md
 
 Contains:
 

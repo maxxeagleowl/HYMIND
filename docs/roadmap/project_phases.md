@@ -49,7 +49,8 @@ Create a clean, scalable, and production ready project foundation.
 - README.md
 - AGENTS.md
 - docs/
-- skills/
+- skills/governance/
+- skills/operational/
 - src/
 - config/
 
