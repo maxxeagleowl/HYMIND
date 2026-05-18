@@ -6,6 +6,7 @@ tools can be merged into a single list by downstream workflow nodes.
 
 import logging
 import os
+import re
 import sys
 
 import requests
@@ -25,6 +26,15 @@ _TIMEOUT: int = 20
 _MAX_RETRIES: int = 3
 _BASE_URL: str = "https://newsapi.org/v2"
 _REMOVED_SENTINEL: str = "[Removed]"
+
+_HTML_TAG_RE = re.compile(r"<[^>]+>")
+_WHITESPACE_RE = re.compile(r"\s+")
+
+
+def _strip_html(text: str) -> str:
+    """Remove HTML tags and collapse whitespace from a snippet string."""
+    text = _HTML_TAG_RE.sub(" ", text or "")
+    return _WHITESPACE_RE.sub(" ", text).strip()
 
 
 class NewsAPIRateLimitError(Exception):
@@ -69,7 +79,7 @@ def _normalize(article: dict, query: str, rank: int) -> dict:
     return {
         "title": (article.get("title") or "").strip(),
         "url": article.get("url") or "",
-        "snippet": article.get("description") or "",
+        "snippet": _strip_html(article.get("description") or ""),
         "published_at": article.get("publishedAt"),
         "source": source_name,
         "source_type": "news",
@@ -153,7 +163,16 @@ def _call_newsapi(
             f"NewsAPI returned HTTP {response.status_code}", response=response
         )
 
-    data = response.json()
+    try:
+        data = response.json()
+    except ValueError as exc:
+        logger.error(
+            "NewsAPI JSON decode error | status=%d | query=%r | error=%s",
+            response.status_code,
+            query,
+            exc,
+        )
+        raise
 
     # NewsAPI signals application errors via the response body even on HTTP 200
     if data.get("status") == "error":

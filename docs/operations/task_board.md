@@ -22,3 +22,9 @@
 | HYM-017 | Create workflow diagram | Medium | 1h | HYM-016 | Done |
 | HYM-018 | Final testing | High | 3h | All implementation tasks | Done |
 | HYM-019 | Demo preparation | Medium | 2h | HYM-018 | Planned |
+| HYM-020 | Phase 2 collector abstraction (CollectorProtocol + validation) | High | 1h | HYM-018 | Done |
+| HYM-021 | Phase 2 NewsAPI test suite (all failure modes, schema compat, validation) | High | 2h | HYM-020 | Done |
+| HYM-022 | Phase 2 API integration documentation | Medium | 1h | HYM-021 | Done |
+| HYM-023 | Phase 3 LangGraph orchestration hardening + second integration | High | 4h | HYM-022 | Planned |
+| HYM-024 | Phase 3 RAG / ChromaDB cross-run deduplication | Medium | 3h | HYM-023 | Planned |
+| HYM-025 | Phase 3 scheduled report delivery (Telegram or Gmail) | Medium | 2h | HYM-023 | Planned |

@@ -27,12 +27,22 @@ docs/
 └── decision_log.md
 ```
 
+## Phase Status
+
+| Phase | Status | Summary |
+|---|---|---|
+| Phase 0 | Complete | Repository scaffolding, documentation structure, memory system |
+| Phase 1 | Complete | All integrations (OpenAI, Serper, NewsAPI, RSS, crawler), LangGraph workflow, report generator, 72 tests |
+| Phase 2 | Complete | Collector abstraction, validation layer, Phase 2 NewsAPI test suite, API integration docs |
+| Phase 3 | Planned | Advanced orchestration, monitoring, alerting, RAG, trend analysis |
+
 ## Operational Notes
 
 - `project_state.md` and `decision_log.md` remain in the docs root.
 - Memory behavior remains in `memory/` and is unchanged.
 - Internal references should use the new subfolder paths above.
 - Reporting standards now live at `docs/operations/reporting_standards.md`.
+- Phase 2 adds: `src/hymind/tools/collector.py`, `tests/test_news_api_collector.py`, `docs/architecture/phase_2_research_foundation.md`.
 
 ## Skills Structure
 

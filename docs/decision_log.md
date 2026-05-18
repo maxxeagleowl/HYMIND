@@ -3,3 +3,7 @@
 - 2026-05-18: Reorganized the docs directory into architecture, roadmap, operations, and planning subfolders while keeping `project_state.md` and `decision_log.md` in the docs root to preserve operational status tracking and decision history.
 - 2026-05-18: Moved the reporting standards document into `docs/operations/reporting_standards.md` and corrected the filename typo.
 - 2026-05-18: Split the skills directory into governance and operational categories to separate system behavior rules from domain execution rules.
+- 2026-05-18: Phase 2 — Added CollectorProtocol as a structural typing.Protocol (not ABC) so existing module-level search() functions satisfy the interface without subclassing. Kept the abstraction minimal: one __call__ signature, no required base class.
+- 2026-05-18: Phase 2 — Kept source_type as "news" (not "newsapi") for NewsAPI results. Changing to "newsapi" would break 2 existing Phase 1 tests (test_news_api_source_type_is_news, test_all_three_schemas_identical). The value "news" is semantically correct and unambiguous within the shared schema.
+- 2026-05-18: Phase 2 — Added _strip_html to news_api._normalize() snippet field. NewsAPI description fields occasionally contain HTML entities. Stripping at normalization time (same as RSS reader) keeps the validation layer simple and prevents HTML from entering the pipeline.
+- 2026-05-18: Phase 2 — JSON decode error in _call_newsapi now logs the error context before re-raising ValueError. Adds observability without changing the error propagation contract.
