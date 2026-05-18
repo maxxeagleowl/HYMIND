@@ -13,3 +13,12 @@ project_planning.md
 .gitignore
 docs/constraints/data_governance.md
 docs/constraints/engineering_constraints.md
+*.egg-info/
+src/hymind.egg-info/
+.vscode/
+build/
+dist/
+logs/
+*.py[cod]
+*.pyo
+.gitignore

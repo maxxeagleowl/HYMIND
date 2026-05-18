@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hymind"
+version = "0.1.0"
+description = "Autonomous Hydrogen Engineering Intelligence Agent"
+requires-python = ">=3.11"
+dependencies = [
+    "openai",
+    "langchain",
+    "langgraph",
+    "python-dotenv",
+    "requests",
+    "feedparser",
+    "beautifulsoup4",
+    "lxml",
+    "markdown",
+    "fpdf2",
+    "pydantic",
+    "tenacity",
+    "rich",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
