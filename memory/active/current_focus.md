@@ -2,7 +2,7 @@
 
 ## Active Work
 
-Phase 1 implementation — API integration layer complete.
+Phase 1 implementation — all data collection tools complete.
 
 ## Completed This Session
 
@@ -12,10 +12,12 @@ Phase 1 implementation — API integration layer complete.
 - HYM-007: Serper API — `src/hymind/tools/serper_search.py`
 - HYM-008: NewsAPI — `src/hymind/tools/news_api.py`
 - HYM-009: RSS ingestion — `src/hymind/tools/rss_reader.py`
-- Schema alignment: all three tools (Serper, NewsAPI, RSS) share identical field names
+- HYM-010: Web crawler — `src/hymind/tools/web_crawler.py`
+- Schema alignment: Serper, NewsAPI, and RSS share identical field names
+- Crawler uses a separate schema (content, content_length, extraction_success)
 
 ## Next Task
 
-HYM-010: Web crawler — `src/hymind/tools/web_crawler.py`
+HYM-011: LangGraph workflow — orchestrates all tools into a research pipeline.
 
 Awaiting confirmation before proceeding.
