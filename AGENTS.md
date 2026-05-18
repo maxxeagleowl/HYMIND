@@ -34,3 +34,17 @@
 - Prefer lightweight checks first.
 - If code is added later, run the smallest useful validation command.
 - Report any missing tests or unresolved risks clearly.
+
+## Skill System
+
+The HYMIND project uses two categories of skills:
+
+### Governance Skills
+
+Govern system architecture, workflow behavior, reliability, memory, and engineering standards.
+
+### Operational Skills
+
+Govern domain specific execution behavior such as hydrogen research, source validation, and executive report generation.
+
+All skills inside the `skills/` directory are considered mandatory operational constraints for Codex.
