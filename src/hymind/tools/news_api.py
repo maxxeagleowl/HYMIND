@@ -107,6 +107,8 @@ def _call_newsapi(
     page_size: int,
     language: str,
     sort_by: str,
+    from_date: str | None = None,
+    to_date: str | None = None,
 ) -> dict:
     """Execute one NewsAPI GET request. Retried by tenacity on transient failures.
 
@@ -125,19 +127,26 @@ def _call_newsapi(
     url = f"{base}/everything"
 
     headers = {"X-Api-Key": api_key}
-    params = {
+    params: dict = {
         "q": query,
         "language": language,
         "sortBy": sort_by,
         "pageSize": page_size,
     }
+    if from_date:
+        params["from"] = from_date
+    if to_date:
+        params["to"] = to_date
 
     logger.debug(
-        "NewsAPI GET /everything | query=%r | pageSize=%d | language=%s | sortBy=%s",
+        "NewsAPI GET /everything | query=%r | pageSize=%d | language=%s | sortBy=%s"
+        " | from=%s | to=%s",
         query,
         page_size,
         language,
         sort_by,
+        from_date or "-",
+        to_date or "-",
     )
 
     response = requests.get(url, params=params, headers=headers, timeout=_TIMEOUT)
@@ -191,6 +200,8 @@ def search(
     num_results: int | None = None,
     language: str = "en",
     sort_by: str = "publishedAt",
+    from_date: str | None = None,
+    to_date: str | None = None,
 ) -> list[dict]:
     """Search NewsAPI and return a normalized list of articles.
 
@@ -208,6 +219,10 @@ def search(
             env var, or 10 if not set.
         language: ISO 639-1 language code. Defaults to 'en'.
         sort_by: NewsAPI sort order — 'publishedAt', 'relevancy', or 'popularity'.
+        from_date: Oldest article date in ISO 8601 format (e.g. '2026-05-01'
+            or '2026-05-01T00:00:00'). Omit to use the NewsAPI default window.
+            Note: the free Developer plan only covers the past 30 days.
+        to_date: Most recent article date in ISO 8601 format. Omit for no upper bound.
 
     Returns:
         Normalized article list. Returns [] on empty query or zero results.
@@ -230,15 +245,21 @@ def search(
     clean_query = query.strip()
 
     logger.info(
-        "NewsAPI search | query=%r | num_results=%d | language=%s | sort=%s",
+        "NewsAPI search | query=%r | num_results=%d | language=%s | sort=%s"
+        " | from=%s | to=%s",
         clean_query,
         effective_num,
         language,
         sort_by,
+        from_date or "-",
+        to_date or "-",
     )
 
     try:
-        data = _call_newsapi(api_key, clean_query, effective_num, language, sort_by)
+        data = _call_newsapi(
+            api_key, clean_query, effective_num, language, sort_by,
+            from_date=from_date, to_date=to_date,
+        )
     except (NewsAPIRateLimitError, NewsAPIServerError, requests.RequestException) as exc:
         logger.error("NewsAPI search failed | query=%r | error=%s", clean_query, exc)
         raise

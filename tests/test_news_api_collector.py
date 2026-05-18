@@ -164,6 +164,16 @@ class TestSuccessfulResponse:
                 results = search("hydrogen")
         assert len(results) == 3
 
+    def test_from_and_to_dates_passed_to_api_request(self):
+        """from_date and to_date must appear in the params sent to the NewsAPI endpoint."""
+        with patch("hymind.tools.news_api.requests.get", return_value=_ok_response([_article()])) as mock_get:
+            with patch.dict(os.environ, {"NEWS_API_KEY": "test-key"}):
+                search("hydrogen", from_date="2026-05-01", to_date="2026-05-18")
+        _, call_kwargs = mock_get.call_args
+        params = call_kwargs.get("params", {})
+        assert params.get("from") == "2026-05-01"
+        assert params.get("to") == "2026-05-18"
+
 
 # ---------------------------------------------------------------------------
 # Empty and missing results
