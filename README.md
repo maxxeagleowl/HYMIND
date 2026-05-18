@@ -8,24 +8,20 @@ HYMIND collects external market, technology, and policy signals from multiple so
 
 ## Current Status
 
-**Phase 1 MVP Completed**
+**Phase 1 + Phase 2 + Phase 3 Completed**
 
-All Phase 1 capabilities are implemented, tested, and operational:
-
-| Capability | Status |
-|---|---|
-| Serper web search integration | Done |
-| NewsAPI article retrieval | Done |
-| RSS feed ingestion | Done |
-| Web content crawler | Done |
-| LangGraph research workflow | Done |
-| OpenAI report synthesis | Done |
-| Markdown report generation | Done |
-| Automated test suite (72 tests) | Done |
-
-**Phase 2 — Planned Future Enhancements**
-
-PDF export, email/Telegram delivery, scheduled automation, RAG/vector memory, parallelized collection, and n8n workflow integration are planned for Phase 2 and are not included in this release.
+| Capability | Phase | Status |
+|---|---|---|
+| Serper web search integration | 1 | Done |
+| NewsAPI article retrieval | 1 | Done |
+| RSS feed ingestion | 1 | Done |
+| Web content crawler | 1 | Done |
+| LangGraph research workflow | 1 | Done |
+| OpenAI report synthesis | 1 | Done |
+| Markdown report generation | 1 | Done |
+| Collector abstraction + validation layer | 2 | Done |
+| Pinecone RAG storage and retrieval | 3 | Done |
+| Automated test suite (170 tests) | 1–3 | Done |
 
 ---
 
@@ -42,7 +38,9 @@ flowchart TD
         N3 --> N4[collect_rss]
         N4 --> N5[merge_and_deduplicate]
         N5 --> N6[crawl_selected]
-        N6 --> N7[finalize_state]
+        N6 --> N7[store_findings_in_pinecone]
+        N7 --> N8[retrieve_context_from_pinecone]
+        N8 --> N9[finalize_state]
     end
 
     subgraph Tools["Data Collection Tools"]
@@ -77,8 +75,10 @@ flowchart TD
 | 4 | `collect_rss` | Fetches entries from configured hydrogen RSS feeds |
 | 5 | `merge_and_deduplicate` | Combines all sources, deduplicates by normalised URL |
 | 6 | `crawl_selected` | Crawls top 5 non-PDF URLs for full article content |
-| 7 | `finalize_state` | Computes counts, duration, and error summary |
-| 8 | `generate_report` | Builds context, calls OpenAI, saves Markdown report |
+| 7 | `store_findings_in_pinecone` | Embeds merged findings and upserts to Pinecone (skipped if not configured) |
+| 8 | `retrieve_context_from_pinecone` | Retrieves top-5 semantically similar historical findings (skipped if not configured) |
+| 9 | `finalize_state` | Computes counts, duration, and error summary |
+| 10 | `generate_report` | Builds context (including RAG history), calls OpenAI, saves Markdown report |
 
 All collection nodes (steps 2–4) fail gracefully: a missing API key or network error appends to the `errors` or `warnings` list and the pipeline continues with partial results.
 
@@ -101,6 +101,43 @@ All collection tools produce results with the same field set, enabling lossless 
 | `rank` | `int` | Position within its source |
 
 The crawler uses a separate schema (`content`, `content_length`, `extraction_success`) since it produces full page text rather than search snippets.
+
+---
+
+## RAG Layer (Phase 3)
+
+HYMIND includes a Pinecone-backed retrieval layer that gives the report generator access to historical findings from previous runs.
+
+### Why Pinecone
+
+Each research run collects 10–30 normalized findings. Without persistent memory, the system starts cold every time and cannot track trends or compare current intelligence against past signals. Pinecone provides managed vector search with metadata filtering, enabling semantic retrieval across all previous runs.
+
+### What is stored
+
+Each merged finding is embedded (title + snippet via `text-embedding-3-small`) and stored with metadata:
+
+| Field | Description |
+|---|---|
+| `title`, `url`, `source`, `source_type` | Source identity |
+| `published_at` | Original publication date |
+| `snippet` | Search/article summary |
+| `content_preview` | First 500 chars of crawled content (if available) |
+| `topic` | Research topic used for this run |
+| `collected_at` | ISO timestamp when stored |
+
+### Retrieval behavior
+
+After each run's findings are stored, the pipeline queries Pinecone for the top 5 semantically closest historical findings using the current topic as the query. Retrieved context is injected into the report's research context under a `=== HISTORICAL CONTEXT ===` header, giving the LLM signal for trend comparison and pattern recognition.
+
+### Graceful degradation
+
+If `PINECONE_API_KEY` or `OPENAI_API_KEY` is absent, both RAG nodes emit a warning and the pipeline continues without error. Reports are still generated — they just have no historical context section.
+
+### Cost and rate limits
+
+- Embeddings: `text-embedding-3-small` costs ~$0.02/1M tokens. A typical run with 20 findings embeds ~5,000 tokens — negligible cost.
+- Pinecone: Free serverless tier includes 1 index with 100K vectors, sufficient for months of daily runs.
+- No retries in the RAG layer beyond the OpenAI client defaults. Transient failures emit a warning rather than crashing.
 
 ---
 
@@ -179,6 +216,7 @@ Copy-Item .env.example .env
 ```env
 OPENAI_API_KEY=sk-...
 OPENAI_MODEL=gpt-4o-mini
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 
 SERPER_API_KEY=...
 SERPER_SEARCH_URL=https://google.serper.dev/search
@@ -186,10 +224,31 @@ SERPER_SEARCH_URL=https://google.serper.dev/search
 NEWS_API_KEY=...
 NEWS_API_BASE_URL=https://newsapi.org/v2
 
+# Optional — Pinecone RAG layer (Phase 3)
+PINECONE_API_KEY=
+PINECONE_INDEX_NAME=hymind-research
+PINECONE_CLOUD=aws
+PINECONE_REGION=us-east-1
+
 LOG_LEVEL=INFO
 MAX_SEARCH_RESULTS=10
 MAX_ARTICLES_PER_RUN=10
 ```
+
+### Pinecone Setup (optional — Phase 3 RAG)
+
+If you want historical context in reports, configure a Pinecone index before running:
+
+1. Create a free account at [app.pinecone.io](https://app.pinecone.io)
+2. Create a Serverless index with these settings:
+   - **Name**: `hymind-research` (or set `PINECONE_INDEX_NAME`)
+   - **Dimensions**: `1536`
+   - **Metric**: `cosine`
+   - **Cloud / Region**: `aws / us-east-1` (or adjust env vars)
+3. Copy your API key to `PINECONE_API_KEY` in `.env`
+4. Run the pipeline normally — findings are stored automatically on each run
+
+Without Pinecone configured, the pipeline skips RAG storage and retrieval silently.
 
 ### Run the full pipeline
 
@@ -215,12 +274,18 @@ HYMIND/
 │   │   ├── serper_search.py      # Serper web search
 │   │   ├── news_api.py           # NewsAPI article retrieval
 │   │   ├── rss_reader.py         # RSS/Atom feed ingestion
-│   │   └── web_crawler.py        # Article content extraction
+│   │   ├── web_crawler.py        # Article content extraction
+│   │   └── collector.py          # CollectorProtocol + validation layer (Phase 2)
+│   ├── rag/
+│   │   ├── schemas.py            # StoredFinding / RetrievedFinding dataclasses (Phase 3)
+│   │   ├── embeddings.py         # OpenAI embeddings client (Phase 3)
+│   │   ├── pinecone_store.py     # Pinecone upsert and query (Phase 3)
+│   │   └── retriever.py          # High-level store_from_state / retrieve_context (Phase 3)
 │   ├── workflows/
 │   │   ├── state.py              # AgentState TypedDict
-│   │   └── research_workflow.py  # LangGraph 7-node pipeline
+│   │   └── research_workflow.py  # LangGraph 9-node pipeline
 │   ├── reporting/
-│   │   └── report_generator.py   # OpenAI report synthesis
+│   │   └── report_generator.py   # OpenAI report synthesis (includes RAG context)
 │   └── utils/
 │       └── logger.py             # Shared structured logger
 ├── docs/

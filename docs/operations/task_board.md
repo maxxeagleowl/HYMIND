@@ -25,6 +25,9 @@
 | HYM-020 | Phase 2 collector abstraction (CollectorProtocol + validation) | High | 1h | HYM-018 | Done |
 | HYM-021 | Phase 2 NewsAPI test suite (all failure modes, schema compat, validation) | High | 2h | HYM-020 | Done |
 | HYM-022 | Phase 2 API integration documentation | Medium | 1h | HYM-021 | Done |
-| HYM-023 | Phase 3 LangGraph orchestration hardening + second integration | High | 4h | HYM-022 | Planned |
-| HYM-024 | Phase 3 RAG / ChromaDB cross-run deduplication | Medium | 3h | HYM-023 | Planned |
-| HYM-025 | Phase 3 scheduled report delivery (Telegram or Gmail) | Medium | 2h | HYM-023 | Planned |
+| HYM-023 | Phase 3 Pinecone RAG storage (store_findings_in_pinecone node) | High | 2h | HYM-022 | Done |
+| HYM-024 | Phase 3 Pinecone RAG retrieval (retrieve_context_from_pinecone node) | High | 2h | HYM-023 | Done |
+| HYM-025 | Phase 3 RAG test suite (46 tests, no live API calls) | High | 2h | HYM-024 | Done |
+| HYM-026 | Phase 3 report generator RAG context injection | Medium | 1h | HYM-024 | Done |
+| HYM-027 | Phase 3 documentation (README, .env.example, decision log, task board) | Medium | 1h | HYM-025 | Done |
+| HYM-028 | Phase 4 scheduled report delivery (Telegram or Gmail) | Medium | 2h | HYM-027 | Planned |

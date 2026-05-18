@@ -11,4 +11,5 @@ fpdf2
 pydantic
 tenacity
 rich
+pinecone
 pytest

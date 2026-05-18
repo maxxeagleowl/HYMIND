@@ -6,7 +6,9 @@ without requiring redesign: each source node writes to its own isolated field.
 
 Node order:
     initialize_state → collect_serper → collect_news → collect_rss
-    → merge_and_deduplicate → crawl_selected → finalize_state → END
+    → merge_and_deduplicate → crawl_selected
+    → store_findings_in_pinecone → retrieve_context_from_pinecone
+    → finalize_state → END
 """
 
 import os
@@ -192,6 +194,62 @@ def crawl_selected(state: AgentState) -> dict:
         }
 
 
+def store_findings_in_pinecone(state: AgentState) -> dict:
+    """Embed merged findings and upsert them into Pinecone.
+
+    Skips gracefully with a warning when Pinecone or OpenAI credentials are absent.
+    Never raises — a storage failure must not block report generation.
+    """
+    logger.info("Node: store_findings_in_pinecone | topic=%r", state["topic"])
+
+    from hymind.rag.pinecone_store import is_pinecone_configured
+
+    if not is_pinecone_configured():
+        logger.warning("store_findings_in_pinecone: Pinecone not configured — skipping")
+        return {"warnings": ["store_findings_in_pinecone: Pinecone not configured — RAG storage skipped"]}
+
+    if not os.getenv("OPENAI_API_KEY", "").strip():
+        logger.warning("store_findings_in_pinecone: OPENAI_API_KEY missing — skipping")
+        return {"warnings": ["store_findings_in_pinecone: OPENAI_API_KEY missing — RAG storage skipped"]}
+
+    try:
+        from hymind.rag.retriever import store_from_state
+        count = store_from_state(state, topic=state["topic"])
+        logger.info("Node: store_findings_in_pinecone complete | stored=%d", count)
+        return {}
+    except Exception as exc:
+        logger.error("Node: store_findings_in_pinecone failed | error=%s", exc)
+        return {"warnings": [f"store_findings_in_pinecone: {type(exc).__name__}: {exc}"]}
+
+
+def retrieve_context_from_pinecone(state: AgentState) -> dict:
+    """Retrieve historical context from Pinecone for the current topic.
+
+    Skips gracefully when Pinecone is not configured. Returns rag_context as a
+    list of plain dicts (dataclasses serialized via dataclasses.asdict) so that
+    downstream nodes can use .get() without importing the RAG schema.
+    """
+    import dataclasses
+
+    logger.info("Node: retrieve_context_from_pinecone | topic=%r", state["topic"])
+
+    try:
+        from hymind.rag.retriever import retrieve_context
+        results = retrieve_context(topic=state["topic"], query=state["topic"], top_k=5)
+        rag_dicts = [dataclasses.asdict(r) for r in results]
+        logger.info(
+            "Node: retrieve_context_from_pinecone complete | results=%d",
+            len(rag_dicts),
+        )
+        return {"rag_context": rag_dicts}
+    except Exception as exc:
+        logger.error("Node: retrieve_context_from_pinecone failed | error=%s", exc)
+        return {
+            "rag_context": [],
+            "warnings": [f"retrieve_context_from_pinecone: {type(exc).__name__}: {exc}"],
+        }
+
+
 def finalize_state(state: AgentState) -> dict:
     """Compute final run_metadata counters and elapsed duration."""
     logger.info("Node: finalize_state")
@@ -260,6 +318,8 @@ def build_workflow():
     graph.add_node("collect_rss", collect_rss)
     graph.add_node("merge_and_deduplicate", merge_and_deduplicate)
     graph.add_node("crawl_selected", crawl_selected)
+    graph.add_node("store_findings_in_pinecone", store_findings_in_pinecone)
+    graph.add_node("retrieve_context_from_pinecone", retrieve_context_from_pinecone)
     graph.add_node("finalize_state", finalize_state)
 
     graph.add_edge(START, "initialize_state")
@@ -268,7 +328,9 @@ def build_workflow():
     graph.add_edge("collect_news", "collect_rss")
     graph.add_edge("collect_rss", "merge_and_deduplicate")
     graph.add_edge("merge_and_deduplicate", "crawl_selected")
-    graph.add_edge("crawl_selected", "finalize_state")
+    graph.add_edge("crawl_selected", "store_findings_in_pinecone")
+    graph.add_edge("store_findings_in_pinecone", "retrieve_context_from_pinecone")
+    graph.add_edge("retrieve_context_from_pinecone", "finalize_state")
     graph.add_edge("finalize_state", END)
 
     return graph.compile()

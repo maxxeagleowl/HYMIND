@@ -34,7 +34,7 @@ docs/
 | Phase 0 | Complete | Repository scaffolding, documentation structure, memory system |
 | Phase 1 | Complete | All integrations (OpenAI, Serper, NewsAPI, RSS, crawler), LangGraph workflow, report generator, 72 tests |
 | Phase 2 | Complete | Collector abstraction, validation layer, Phase 2 NewsAPI test suite, API integration docs |
-| Phase 3 | Planned | Advanced orchestration, monitoring, alerting, RAG, trend analysis |
+| Phase 3 | Complete | Pinecone RAG storage and retrieval, 46 new tests, backward-compatible workflow nodes |
 
 ## Operational Notes
 
@@ -43,6 +43,7 @@ docs/
 - Internal references should use the new subfolder paths above.
 - Reporting standards now live at `docs/operations/reporting_standards.md`.
 - Phase 2 adds: `src/hymind/tools/collector.py`, `tests/test_news_api_collector.py`, `docs/architecture/phase_2_research_foundation.md`.
+- Phase 3 adds: `src/hymind/rag/` (schemas, embeddings, pinecone_store, retriever), `tests/test_rag.py`, two new LangGraph nodes (`store_findings_in_pinecone`, `retrieve_context_from_pinecone`), `rag_context` field in AgentState, RAG context injection in report_generator.py.
 
 ## Skills Structure
 

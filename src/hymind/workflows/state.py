@@ -31,6 +31,10 @@ class AgentState(TypedDict):
     # --- Run tracking ---
     run_metadata: dict
 
+    # --- RAG context ---
+    # RetrievedFinding dicts from Pinecone (empty list when RAG is not configured)
+    rag_context: list[dict]
+
     # --- Report output ---
     report_path: str  # Absolute path to the saved Markdown report, or "" if not yet generated
 
@@ -47,5 +51,6 @@ def initial_state(topic: str) -> AgentState:
         "errors": [],
         "warnings": [],
         "run_metadata": {},
+        "rag_context": [],
         "report_path": "",
     }

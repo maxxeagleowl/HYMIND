@@ -21,6 +21,7 @@ dependencies = [
     "pydantic",
     "tenacity",
     "rich",
+    "pinecone",
 ]
 
 [tool.setuptools.packages.find]

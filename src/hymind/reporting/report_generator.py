@@ -100,6 +100,7 @@ def build_context(state: AgentState) -> tuple[str, int]:
     """Build a compact research context string from the workflow state.
 
     Context is assembled in priority order:
+      0. RAG historical context — findings retrieved from Pinecone (previous runs)
       1. Successfully crawled pages — highest signal quality (full content excerpt)
       2. Merged search / news / RSS results — snippet-level signal
 
@@ -110,6 +111,34 @@ def build_context(state: AgentState) -> tuple[str, int]:
     """
     parts: list[str] = []
     source_count: int = 0
+
+    # --- Priority 0: RAG retrieved historical context (highest signal for trend continuity) ---
+    rag_context = state.get("rag_context", [])
+    if rag_context:
+        rag_parts: list[str] = []
+        for r in rag_context[:5]:
+            title = r.get("title", "") if isinstance(r, dict) else getattr(r, "title", "")
+            url = r.get("url", "") if isinstance(r, dict) else getattr(r, "url", "")
+            source = r.get("source", "") if isinstance(r, dict) else getattr(r, "source", "")
+            snippet = r.get("snippet", "") if isinstance(r, dict) else getattr(r, "snippet", "")
+            score = r.get("score", 0.0) if isinstance(r, dict) else getattr(r, "score", 0.0)
+            snippet_excerpt = (snippet or "")[:_MAX_SNIPPET_CHARS]
+            rag_parts.append(
+                f"[HISTORICAL | {source}] (relevance score: {score:.2f})\n"
+                f"Title: {title}\n"
+                f"URL: {url}\n"
+                f"{snippet_excerpt}"
+            )
+        if rag_parts:
+            historical_block = (
+                "=== HISTORICAL CONTEXT (retrieved from previous research runs) ===\n\n"
+                + "\n\n---\n\n".join(rag_parts)
+            )
+            parts.append(historical_block)
+            source_count += len(rag_parts)
+            logger.debug(
+                "build_context: added %d RAG results to context", len(rag_parts)
+            )
 
     # --- Priority 1: crawled pages with successful extraction ---
     for r in state.get("crawled_results", []):
