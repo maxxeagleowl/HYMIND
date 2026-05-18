@@ -7,3 +7,7 @@ __pycache__/
 .ruff_cache/
 *.log
 LOP.md
+project_brief.md
+project_deliverables.md
+project_planning.md
+.gitignore

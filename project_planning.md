@@ -19,4 +19,4 @@ Check each agent-supported task against its definition of done• Fix bugs and e
 ## Final Polish & Presentation
 Complete README and documentation• Create architecture or workflow diagrams• Confirm docs/stories.md or planning board is linked and complete• Confirm project specification, AGENTS.md files, and skills/ are included
 Run final end-to-end tests• Prepare demo video or presentation
-Submit project repository
+Submit project repository 

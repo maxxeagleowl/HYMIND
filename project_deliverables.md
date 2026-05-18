@@ -61,4 +61,4 @@ Key architecture decisions and tradeoffs
 One reliability feature, such as validation, retry logic, or error handling
 How your Agile plan, task definitions of done, agent specification, and skills/ directory are organized
 Submission
-Submit your GitHub repository link as specified by your instructor. Do not submit secrets, API keys, standalone Google Docs, or cloud-only links as the primary artifact.
+Submit your GitHub repository link as specified by your instructor. Do not submit secrets, API keys, standalone Google Docs, or cloud-only links as the primary artifact. 
