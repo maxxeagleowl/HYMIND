@@ -473,3 +473,5 @@ The goal of this project is to demonstrate a real world autonomous AI research a
 - Production style reliability
 
 The project focuses on building a realistic industry intelligence solution for the hydrogen sector using modern AI engineering practices.
+
+

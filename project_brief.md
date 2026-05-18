@@ -1,6 +1,5 @@
 Project 3 Brief Project
 
-
 Project Overview
 Project Name: Autonomous Company Research & Report Generation Agent Duration: 5 days, self-paced Type: Individual Module: Module 3 (Integrates skills from RAG, LangChain, LangGraph, and N8N)
 
