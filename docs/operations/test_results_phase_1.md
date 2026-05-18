@@ -138,7 +138,7 @@ python -m hymind.main "EU hydrogen funding programs and industrial investments 2
 
 | File | Topic | Crawl Success |
 |---|---|---|
-| `samples/reports/sample_03_eu_hydrogen_funding_2026.md` | EU hydrogen funding programs and industrial investments 2026 | 5/5 |
+| `outputs/reports/20260518_172414_hymind_report.md` | EU hydrogen funding programs and industrial investments 2026 | 5/5 |
 
 ---
 

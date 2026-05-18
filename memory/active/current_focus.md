@@ -19,7 +19,7 @@ All Phase 1 tasks are done, tested, and documented.
 | LangGraph workflow | `src/hymind/workflows/` | Done |
 | Report generator | `src/hymind/reporting/report_generator.py` | Done |
 | Test suite (72 tests) | `tests/` | Done |
-| Sample reports | `samples/reports/` | 3 reports |
+| Sample reports | `outputs/reports/` | 3 reports |
 | CLI topic input | `src/hymind/main.py` | Done |
 | Documentation | `docs/`, `README.md` | Done |
 

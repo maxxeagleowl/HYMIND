@@ -233,8 +233,7 @@ HYMIND/
 │   ├── governance/               # Engineering behavior rules
 │   └── operational/              # Domain execution rules
 ├── memory/active/                # Session operational memory
-├── samples/reports/              # Curated sample reports (tracked in git)
-├── outputs/reports/              # Generated runtime reports (gitignored)
+├── outputs/reports/              # Generated Markdown reports (gitignored)
 ├── logs/                         # Runtime log files (gitignored)
 ├── tests/                        # Automated test suite (72 tests)
 ├── .env.example                  # Configuration template
@@ -249,6 +248,5 @@ HYMIND/
 - Do not commit `.env` or any file containing real API keys
 - Generated reports land in `outputs/reports/` — excluded from git
 - Log files land in `logs/` — excluded from git
-- Sample reports are kept in `samples/reports/` — tracked in git for reference
 - Keep changes small and focused; the workflow is the integration point
 - Phase 1 MVP is complete; Phase 2 adds PDF export, notifications, and scheduling
