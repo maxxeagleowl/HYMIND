@@ -1,4 +1,4 @@
-"""HYMIND entry point — Phase 1 research workflow."""
+"""HYMIND entry point — full research and report pipeline."""
 
 from dotenv import load_dotenv
 
@@ -6,63 +6,59 @@ load_dotenv()
 
 from hymind.utils.logger import get_logger
 from hymind.workflows.research_workflow import run_research
+from hymind.reporting.report_generator import generate_report
 
 logger = get_logger("hymind.main")
 
 
-def smoke_test_workflow() -> None:
-    """Run the full research pipeline and print a structured result summary."""
+def smoke_test_full_pipeline() -> None:
+    """Run the complete pipeline: research workflow → report generation."""
     topic = "hydrogen fuel cell market Europe 2026"
-    logger.info("Workflow smoke test starting | topic=%r", topic)
+    logger.info("Full pipeline starting | topic=%r", topic)
 
-    result = run_research(topic)
+    # --- Step 1: Research workflow ---
+    state = run_research(topic)
+    meta = state.get("run_metadata", {})
+    crawled = state.get("crawled_results", [])
+    crawl_success = sum(1 for r in crawled if r.get("extraction_success"))
 
-    meta = result.get("run_metadata", {})
-    errors = result.get("errors", [])
-    warnings = result.get("warnings", [])
+    # --- Step 2: Report generation ---
+    try:
+        report_path, char_count = generate_report(state)
+    except RuntimeError as exc:
+        logger.error("Report generation skipped | reason=%s", exc)
+        print(f"\n[HYMIND] Report generation failed: {exc}")
+        return
 
-    logger.info(
-        "Workflow smoke test complete | merged=%d | errors=%d",
-        meta.get("merged_count", 0),
-        len(errors),
-    )
+    logger.info("Full pipeline complete | report=%s | chars=%d", report_path, char_count)
 
     print(f"\n{'='*60}")
-    print(f"  HYMIND Research Workflow — Complete")
+    print(f"  HYMIND — Full Pipeline Complete")
     print(f"{'='*60}")
-    print(f"  Topic          : {result.get('topic', '')}")
-    print(f"  Serper results : {meta.get('serper_count', 0)}")
-    print(f"  News results   : {meta.get('news_count', 0)}")
-    print(f"  RSS results    : {meta.get('rss_count', 0)}")
-    print(f"  Merged (unique): {meta.get('merged_count', 0)}")
-    print(f"  Crawled URLs   : {meta.get('crawled_count', 0)}")
-    print(f"  Crawl success  : {meta.get('crawl_success_count', 0)}")
-    print(f"  Duration       : {meta.get('duration_seconds', 0):.1f}s")
-    print(f"  Errors         : {len(errors)}")
-    print(f"  Warnings       : {len(warnings)}")
+    print(f"  Topic           : {topic}")
+    print(f"  Serper results  : {meta.get('serper_count', 0)}")
+    print(f"  News results    : {meta.get('news_count', 0)}")
+    print(f"  RSS results     : {meta.get('rss_count', 0)}")
+    print(f"  Merged (unique) : {meta.get('merged_count', 0)}")
+    print(f"  Crawl success   : {crawl_success}")
+    print(f"  Report path     : {report_path}")
+    print(f"  Report size     : {char_count:,} characters")
+    print(f"  Duration        : {meta.get('duration_seconds', 0):.1f}s")
     print(f"{'='*60}")
 
-    if errors:
-        print("\nErrors:")
-        for err in errors:
-            print(f"  [ERROR] {err}")
 
-    if warnings:
-        print("\nWarnings:")
-        for w in warnings:
-            print(f"  [WARN]  {w}")
-
-    merged = result.get("merged_results", [])
-    if merged:
-        print(f"\nTop 5 merged results:")
-        for r in merged[:5]:
-            src = r.get("source_type", "?")
-            print(f"  [{src}] {r.get('title', '(no title)')[:70]}")
-            print(f"         {r.get('url', '')[:80]}")
+def smoke_test_workflow() -> None:
+    """Run only the research workflow, no report generation."""
+    topic = "hydrogen fuel cell market Europe 2026"
+    logger.info("Workflow smoke test starting | topic=%r", topic)
+    state = run_research(topic)
+    meta = state.get("run_metadata", {})
+    errors = state.get("errors", [])
+    print(f"\n[HYMIND] Workflow only | merged={meta.get('merged_count', 0)} | errors={len(errors)}")
 
 
 def smoke_test_crawler() -> None:
-    """Validate web crawler across success, non-HTML, and connection-failure cases."""
+    """Validate web crawler."""
     from hymind.tools.web_crawler import crawl_many
 
     urls = [
@@ -70,25 +66,17 @@ def smoke_test_crawler() -> None:
         "https://hydrogeneurope.eu/wp-content/uploads/2026/03/Quarterly-Magazine_Issue-14_Design_March-2026.pdf",
         "https://does-not-resolve.hymind-test.invalid/article",
     ]
-    logger.info("Crawler smoke test starting | urls=%d", len(urls))
     results = crawl_many(urls)
-    successful = [r for r in results if r["extraction_success"]]
-    failed = [r for r in results if not r["extraction_success"]]
-    logger.info("Crawler smoke test complete | successful=%d | failed=%d", len(successful), len(failed))
-    print(f"\n[HYMIND] Crawler smoke test | success={len(successful)} | failed={len(failed)}")
+    successful = sum(1 for r in results if r["extraction_success"])
+    print(f"\n[HYMIND] Crawler smoke test | success={successful}/{len(results)}")
 
 
 def smoke_test_rss() -> None:
-    """Validate RSS ingestion across the default hydrogen feed list."""
+    """Validate RSS ingestion."""
     from hymind.tools.rss_reader import read_feed, DEFAULT_HYDROGEN_FEEDS
 
-    logger.info("RSS smoke test starting | feeds=%d", len(DEFAULT_HYDROGEN_FEEDS))
-    all_results: list[dict] = []
-    for url in DEFAULT_HYDROGEN_FEEDS:
-        results = read_feed(url, topic="hydrogen")
-        all_results.extend(results)
-    logger.info("RSS smoke test complete | total=%d", len(all_results))
-    print(f"\n[HYMIND] RSS smoke test | total={len(all_results)} results")
+    total = sum(len(read_feed(url, topic="hydrogen")) for url in DEFAULT_HYDROGEN_FEEDS)
+    print(f"\n[HYMIND] RSS smoke test | total={total} results")
 
 
 def smoke_test_newsapi() -> None:
@@ -116,8 +104,8 @@ def smoke_test_openai() -> None:
 
 
 def main() -> None:
-    logger.info("HYMIND Phase 1 starting...")
-    smoke_test_workflow()
+    logger.info("HYMIND starting...")
+    smoke_test_full_pipeline()
 
 
 if __name__ == "__main__":

@@ -31,6 +31,9 @@ class AgentState(TypedDict):
     # --- Run tracking ---
     run_metadata: dict
 
+    # --- Report output ---
+    report_path: str  # Absolute path to the saved Markdown report, or "" if not yet generated
+
 
 def initial_state(topic: str) -> AgentState:
     """Return a clean AgentState for the given topic, ready to invoke."""
@@ -44,4 +47,5 @@ def initial_state(topic: str) -> AgentState:
         "errors": [],
         "warnings": [],
         "run_metadata": {},
+        "report_path": "",
     }
