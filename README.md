@@ -55,3 +55,22 @@ n8n/
 - Do not commit secrets.
 - Keep generated outputs in `reports/` and `outputs/`.
 - Keep changes small and incremental until the workflow is implemented.
+
+## Current Implementation Scope
+
+The repository currently implements the Phase 1 MVP foundation.
+
+Phase 1 focuses on:
+- API based research
+- RSS ingestion
+- basic website content extraction
+- source validation
+- OpenAI based synthesis
+- Markdown report generation
+
+The following features are part of the target architecture but are not included in Phase 1:
+- RAG
+- vector database memory
+- n8n orchestration
+- PDF export
+- Telegram or Gmail delivery

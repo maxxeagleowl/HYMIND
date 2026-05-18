@@ -110,7 +110,30 @@ No vector database yet.
 No PDF generation yet.
 No orchestration layer yet.
 
-Focus is reliability and end-to-end functionality.
+Focus is reliability and end-to-end functionality. Phase 1 intentionally focuses only on the autonomous research and report generation core. The goal of this phase is to validate the complete end-to-end research workflow before introducing additional infrastructure complexity.
+
+Included in Phase 1:
+
+- Serper API research
+- NewsAPI collection
+- RSS ingestion
+- Content normalization
+- OpenAI based summarization
+- Markdown executive reports
+- Basic logging and error handling
+
+Explicitly excluded from Phase 1:
+
+- RAG implementation
+- Vector databases
+- Pinecone or ChromaDB
+- n8n orchestration
+- PDF export
+- Telegram or Gmail delivery
+- Long term memory and trend storage
+- Advanced analytics
+
+These components are part of the planned future architecture and are intentionally postponed until the research pipeline is stable and validated.
 
 ---
 
