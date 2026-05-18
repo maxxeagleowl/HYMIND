@@ -70,7 +70,7 @@ Hardcoded credentials are strictly forbidden.
 ```env
 OPENAI_API_KEY=
 SERPER_API_KEY=
-NEWSAPI_KEY=
+NEWS_API_KEY=
 ALPHAVANTAGE_API_KEY=
 ```
 

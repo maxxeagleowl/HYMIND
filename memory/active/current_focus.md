@@ -1,34 +1,46 @@
 # Current Focus
 
-## Active Work
+## Status
 
-Phase 1 complete. Test suite passing. Only HYM-019 (demo preparation) remains.
+**Phase 1 MVP Completed**
 
-## Completed This Session
+All Phase 1 tasks are done, tested, and documented.
 
-All Phase 1 tasks done:
-- HYM-006 through HYM-014: Core integrations and infrastructure
-- HYM-011: LangGraph workflow (7-node sequential pipeline)
-- HYM-012: Report generator (OpenAI synthesis → Markdown)
-- HYM-013b: Stabilization pass (imports, docs, .gitignore, README)
-- HYM-015/016/017: Architecture docs + Mermaid diagram in README + sample reports generated
-- HYM-018: 72 automated tests passing in 0.96s
+## Phase 1 Deliverables
 
-## Test Suite
+| Component | File(s) | Status |
+|---|---|---|
+| Logger | `src/hymind/utils/logger.py` | Done |
+| OpenAI client | `src/hymind/tools/openai_client.py` | Done |
+| Serper search | `src/hymind/tools/serper_search.py` | Done |
+| NewsAPI | `src/hymind/tools/news_api.py` | Done |
+| RSS ingestion | `src/hymind/tools/rss_reader.py` | Done |
+| Web crawler | `src/hymind/tools/web_crawler.py` | Done |
+| LangGraph workflow | `src/hymind/workflows/` | Done |
+| Report generator | `src/hymind/reporting/report_generator.py` | Done |
+| Test suite (72 tests) | `tests/` | Done |
+| Sample reports | `samples/reports/` | 3 reports |
+| CLI topic input | `src/hymind/main.py` | Done |
+| Documentation | `docs/`, `README.md` | Done |
 
+## How to Run
+
+```powershell
+# Default topic
+python -m hymind.main
+
+# Custom topic
+python -m hymind.main "hydrogen funding Germany 2026"
+
+# Tests
+python -m pytest tests/ -v
 ```
-tests/
-├── conftest.py                  # OpenAI singleton reset
-├── test_schemas.py              # 17 tests — schema consistency across tools
-├── test_deduplication.py        # 14 tests — URL normalization and merge logic
-├── test_web_crawler.py          # 20 tests — graceful failure with mocked HTTP
-├── test_report_generator.py     # 12 tests — context assembly, missing key, file output
-└── test_missing_api_keys.py     #  9 tests — sys.exit vs RuntimeError vs warning
-```
 
-Run: `C:\Users\nest\.conda\envs\hymind\python.exe -m pytest tests/ -v`
+## Next Phase
 
-## Remaining
-
-- HYM-019: Demo preparation
-- Next phase: PDF export, notifications, scheduling, RAG
+Phase 2 candidates (not started):
+- PDF export
+- Gmail / Telegram delivery
+- Scheduled automation (n8n or cron)
+- RAG / vector memory
+- Parallelized collection nodes (LangGraph Send())

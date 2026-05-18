@@ -6,6 +6,29 @@ HYMIND collects external market, technology, and policy signals from multiple so
 
 ---
 
+## Current Status
+
+**Phase 1 MVP Completed**
+
+All Phase 1 capabilities are implemented, tested, and operational:
+
+| Capability | Status |
+|---|---|
+| Serper web search integration | Done |
+| NewsAPI article retrieval | Done |
+| RSS feed ingestion | Done |
+| Web content crawler | Done |
+| LangGraph research workflow | Done |
+| OpenAI report synthesis | Done |
+| Markdown report generation | Done |
+| Automated test suite (72 tests) | Done |
+
+**Phase 2 — Planned Future Enhancements**
+
+PDF export, email/Telegram delivery, scheduled automation, RAG/vector memory, parallelized collection, and n8n workflow integration are planned for Phase 2 and are not included in this release.
+
+---
+
 ## Architecture Overview
 
 ```mermaid
@@ -171,7 +194,11 @@ MAX_ARTICLES_PER_RUN=10
 ### Run the full pipeline
 
 ```powershell
+# Default topic
 C:\Users\nest\.conda\envs\hymind\python.exe -m hymind.main
+
+# Custom topic
+C:\Users\nest\.conda\envs\hymind\python.exe -m hymind.main "hydrogen funding Germany 2026"
 ```
 
 Output: a Markdown report in `outputs/reports/`.
@@ -206,8 +233,10 @@ HYMIND/
 │   ├── governance/               # Engineering behavior rules
 │   └── operational/              # Domain execution rules
 ├── memory/active/                # Session operational memory
-├── outputs/reports/              # Generated Markdown reports
-├── logs/                         # Runtime log files
+├── samples/reports/              # Curated sample reports (tracked in git)
+├── outputs/reports/              # Generated runtime reports (gitignored)
+├── logs/                         # Runtime log files (gitignored)
+├── tests/                        # Automated test suite (72 tests)
 ├── .env.example                  # Configuration template
 ├── requirements.txt
 └── pyproject.toml
@@ -220,5 +249,6 @@ HYMIND/
 - Do not commit `.env` or any file containing real API keys
 - Generated reports land in `outputs/reports/` — excluded from git
 - Log files land in `logs/` — excluded from git
+- Sample reports are kept in `samples/reports/` — tracked in git for reference
 - Keep changes small and focused; the workflow is the integration point
 - Phase 1 MVP is complete; Phase 2 adds PDF export, notifications, and scheduling

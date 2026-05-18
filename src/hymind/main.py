@@ -1,4 +1,11 @@
-"""HYMIND entry point — full research and report pipeline."""
+"""HYMIND entry point — full research and report pipeline.
+
+Usage:
+    python -m hymind.main
+    python -m hymind.main "hydrogen funding Germany 2026"
+"""
+
+import sys
 
 from dotenv import load_dotenv
 
@@ -10,10 +17,11 @@ from hymind.reporting.report_generator import generate_report
 
 logger = get_logger("hymind.main")
 
+_DEFAULT_TOPIC: str = "hydrogen fuel cell market Europe 2026"
 
-def smoke_test_full_pipeline() -> None:
+
+def smoke_test_full_pipeline(topic: str) -> None:
     """Run the complete pipeline: research workflow → report generation."""
-    topic = "hydrogen fuel cell market Europe 2026"
     logger.info("Full pipeline starting | topic=%r", topic)
 
     # --- Step 1: Research workflow ---
@@ -47,9 +55,8 @@ def smoke_test_full_pipeline() -> None:
     print(f"{'='*60}")
 
 
-def smoke_test_workflow() -> None:
+def smoke_test_workflow(topic: str = _DEFAULT_TOPIC) -> None:
     """Run only the research workflow, no report generation."""
-    topic = "hydrogen fuel cell market Europe 2026"
     logger.info("Workflow smoke test starting | topic=%r", topic)
     state = run_research(topic)
     meta = state.get("run_metadata", {})
@@ -104,8 +111,10 @@ def smoke_test_openai() -> None:
 
 
 def main() -> None:
-    logger.info("HYMIND starting...")
-    smoke_test_full_pipeline()
+    topic = sys.argv[1] if len(sys.argv) > 1 else _DEFAULT_TOPIC
+    logger.info("HYMIND starting | topic=%r", topic)
+    print(f"\n[HYMIND] Research topic: {topic}")
+    smoke_test_full_pipeline(topic)
 
 
 if __name__ == "__main__":
