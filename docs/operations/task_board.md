@@ -16,8 +16,9 @@
 | HYM-012 | Create report generator | High | 3h | HYM-011 | Done |
 | HYM-013 | Add retry logic | High | 2h | HYM-011 | Done |
 | HYM-014 | Add logging system | Medium | 2h | HYM-011 | Done |
-| HYM-015 | Generate sample reports | High | 2h | HYM-012 | Planned |
-| HYM-016 | Create architecture documentation | Medium | 2h | HYM-011 | Planned |
-| HYM-017 | Create workflow diagram | Medium | 1h | HYM-016 | Planned |
+| HYM-013b | Phase 1 stabilization and hardening | Medium | 2h | HYM-012 | Done |
+| HYM-015 | Generate sample reports | High | 2h | HYM-012 | Done |
+| HYM-016 | Create architecture documentation | Medium | 2h | HYM-011 | Done |
+| HYM-017 | Create workflow diagram | Medium | 1h | HYM-016 | Done |
 | HYM-018 | Final testing | High | 3h | All implementation tasks | Planned |
 | HYM-019 | Demo preparation | Medium | 2h | HYM-018 | Planned |

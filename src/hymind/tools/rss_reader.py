@@ -4,8 +4,8 @@ Result schema matches serper_search.py and news_api.py so outputs from all three
 tools can be merged into a single list by downstream workflow nodes.
 """
 
+import logging
 import re
-import sys
 from urllib.parse import urlparse
 
 import feedparser
@@ -17,7 +17,6 @@ from tenacity import (
     wait_fixed,
     before_sleep_log,
 )
-import logging
 
 from hymind.utils.logger import get_logger
 

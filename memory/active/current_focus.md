@@ -2,31 +2,30 @@
 
 ## Active Work
 
-Phase 2 — report generation implemented. All core pipeline stages complete.
+Phase 1 stabilization complete. All core implementation tasks done.
 
 ## Completed This Session
 
-- HYM-014: Logging system
-- HYM-006: OpenAI client
-- HYM-013: Retry logic
-- HYM-007: Serper API
-- HYM-008: NewsAPI
-- HYM-009: RSS ingestion
-- HYM-010: Web crawler
-- HYM-011: LangGraph workflow (7-node sequential pipeline)
-- HYM-012: Report generator (`src/hymind/reporting/report_generator.py`)
-  - Markdown executive report from AgentState
-  - Context priority: crawled pages → merged results (capped 15k chars)
-  - Single OpenAI call per report (max_tokens=3000)
-  - Saves to outputs/reports/YYYYMMDD_HHMMSS_hymind_report.md
-  - Metadata section appended programmatically
+- HYM-006 through HYM-014: All Phase 1 implementation tasks done
+- HYM-012: Report generator — full end-to-end pipeline validated
+- HYM-013b: Stabilization pass complete:
+  - Unused imports removed
+  - Import ordering fixed
+  - Stale docstrings corrected
+  - Return types and docstrings added to workflow nodes
+  - .gitignore cleaned and extended
+  - README fully rewritten (architecture, Mermaid diagram, workflow steps, tool stack, reliability features)
+- HYM-015/016/017: Resolved via README and live report generation
 
-## Next Tasks (remaining from Phase 1 / Phase 2)
+## Remaining Tasks
 
-- HYM-015: Generate sample reports — first real outputs for evaluation
-- HYM-016: Architecture documentation
-- HYM-017: Workflow diagram
-- HYM-018: Final testing
+- HYM-018: Final testing — structured test pass across all tools and workflow
 - HYM-019: Demo preparation
 
-Awaiting confirmation before proceeding.
+## Next Phase Candidates (post-testing)
+
+- PDF export
+- Telegram / Gmail delivery
+- Scheduled automation (n8n or cron)
+- RAG / vector memory
+- Parallelized collection nodes (LangGraph Send())

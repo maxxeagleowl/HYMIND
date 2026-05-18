@@ -61,6 +61,7 @@ _WHITESPACE_RE = re.compile(r"\n{3,}")
 # ---------------------------------------------------------------------------
 
 def _domain(url: str) -> str:
+    """Return the netloc (host) portion of a URL, or the full URL on parse failure."""
     try:
         return urlparse(url).netloc or url
     except Exception:

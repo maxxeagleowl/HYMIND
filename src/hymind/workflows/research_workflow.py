@@ -9,10 +9,8 @@ Node order:
     → merge_and_deduplicate → crawl_selected → finalize_state → END
 """
 
-import operator
 import os
 from datetime import datetime, timezone
-from typing import Any
 
 from langgraph.graph import END, START, StateGraph
 
@@ -33,6 +31,7 @@ _MAX_CRAWL_URLS: int = 5
 # ---------------------------------------------------------------------------
 
 def _now_iso() -> str:
+    """Return the current UTC time as an ISO 8601 string."""
     return datetime.now(timezone.utc).isoformat()
 
 
@@ -46,6 +45,7 @@ def _normalize_url(url: str) -> str:
 # ---------------------------------------------------------------------------
 
 def initialize_state(state: AgentState) -> dict:
+    """Set up run_metadata with topic and start timestamp."""
     logger.info("Node: initialize_state | topic=%r", state["topic"])
     return {
         "run_metadata": {
@@ -58,6 +58,7 @@ def initialize_state(state: AgentState) -> dict:
 
 
 def collect_serper(state: AgentState) -> dict:
+    """Run a Serper web search for the topic and store results in state."""
     logger.info("Node: collect_serper | topic=%r", state["topic"])
 
     if not os.getenv("SERPER_API_KEY", "").strip():
@@ -80,6 +81,7 @@ def collect_serper(state: AgentState) -> dict:
 
 
 def collect_news(state: AgentState) -> dict:
+    """Query NewsAPI for recent articles matching the topic."""
     logger.info("Node: collect_news | topic=%r", state["topic"])
 
     if not os.getenv("NEWS_API_KEY", "").strip():
@@ -102,6 +104,7 @@ def collect_news(state: AgentState) -> dict:
 
 
 def collect_rss(state: AgentState) -> dict:
+    """Fetch entries from all configured hydrogen RSS feeds."""
     logger.info("Node: collect_rss | feeds=%d", len(DEFAULT_HYDROGEN_FEEDS))
     try:
         results = read_feeds(DEFAULT_HYDROGEN_FEEDS, topic=state["topic"])
@@ -116,6 +119,7 @@ def collect_rss(state: AgentState) -> dict:
 
 
 def merge_and_deduplicate(state: AgentState) -> dict:
+    """Combine all source results and remove duplicates by normalised URL."""
     logger.info("Node: merge_and_deduplicate")
 
     all_results: list[dict] = (
@@ -146,6 +150,7 @@ def merge_and_deduplicate(state: AgentState) -> dict:
 
 
 def crawl_selected(state: AgentState) -> dict:
+    """Crawl the top N non-PDF URLs from merged_results for full content extraction."""
     logger.info("Node: crawl_selected")
 
     merged = state.get("merged_results", [])
@@ -188,6 +193,7 @@ def crawl_selected(state: AgentState) -> dict:
 
 
 def finalize_state(state: AgentState) -> dict:
+    """Compute final run_metadata counters and elapsed duration."""
     logger.info("Node: finalize_state")
 
     meta: dict = state.get("run_metadata", {})

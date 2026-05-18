@@ -130,8 +130,9 @@ def search(
     """Search Serper and return a normalized list of results.
 
     Normalized fields per result:
-        title (str), url (str), snippet (str), date (str | None),
-        source_type (str), search_query (str), rank (int)
+        title (str), url (str), snippet (str), published_at (str | None),
+        source (str), source_type (str), search_query (str),
+        author (None), rank (int)
 
     Args:
         query: Search query string. Empty queries return [] without an API call.

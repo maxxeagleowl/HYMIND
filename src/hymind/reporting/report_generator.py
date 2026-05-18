@@ -203,6 +203,7 @@ def _metadata_section(state: AgentState, source_count: int, report_path: Path) -
 # ---------------------------------------------------------------------------
 
 def _save(content: str, output_dir: Path) -> Path:
+    """Write content to a timestamped Markdown file. Creates output_dir if needed."""
     output_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     path = output_dir / f"{timestamp}_hymind_report.md"
@@ -281,11 +282,9 @@ def generate_report(
     logger.info("Report: OpenAI response received | response_chars=%d", len(report_body))
 
     # --- Replace the [System-generated] placeholder with real metadata ---
-    # Save first (path needed for metadata section)
-    placeholder_report = report_body
-    temp_path = _save(placeholder_report, output_dir)
+    # Save first so the path is available for the metadata section footer.
+    temp_path = _save(report_body, output_dir)
 
-    # Build metadata and replace placeholder
     metadata = _metadata_section(state, source_count, temp_path)
     full_report = report_body.replace("[System-generated]", metadata)
 
