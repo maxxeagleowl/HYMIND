@@ -20,5 +20,5 @@
 | HYM-015 | Generate sample reports | High | 2h | HYM-012 | Done |
 | HYM-016 | Create architecture documentation | Medium | 2h | HYM-011 | Done |
 | HYM-017 | Create workflow diagram | Medium | 1h | HYM-016 | Done |
-| HYM-018 | Final testing | High | 3h | All implementation tasks | Planned |
+| HYM-018 | Final testing | High | 3h | All implementation tasks | Done |
 | HYM-019 | Demo preparation | Medium | 2h | HYM-018 | Planned |

@@ -1,4 +1,4 @@
-﻿openai
+openai
 langchain
 langgraph
 python-dotenv
@@ -11,3 +11,4 @@ fpdf2
 pydantic
 tenacity
 rich
+pytest

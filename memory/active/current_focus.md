@@ -2,30 +2,33 @@
 
 ## Active Work
 
-Phase 1 stabilization complete. All core implementation tasks done.
+Phase 1 complete. Test suite passing. Only HYM-019 (demo preparation) remains.
 
 ## Completed This Session
 
-- HYM-006 through HYM-014: All Phase 1 implementation tasks done
-- HYM-012: Report generator — full end-to-end pipeline validated
-- HYM-013b: Stabilization pass complete:
-  - Unused imports removed
-  - Import ordering fixed
-  - Stale docstrings corrected
-  - Return types and docstrings added to workflow nodes
-  - .gitignore cleaned and extended
-  - README fully rewritten (architecture, Mermaid diagram, workflow steps, tool stack, reliability features)
-- HYM-015/016/017: Resolved via README and live report generation
+All Phase 1 tasks done:
+- HYM-006 through HYM-014: Core integrations and infrastructure
+- HYM-011: LangGraph workflow (7-node sequential pipeline)
+- HYM-012: Report generator (OpenAI synthesis → Markdown)
+- HYM-013b: Stabilization pass (imports, docs, .gitignore, README)
+- HYM-015/016/017: Architecture docs + Mermaid diagram in README + sample reports generated
+- HYM-018: 72 automated tests passing in 0.96s
 
-## Remaining Tasks
+## Test Suite
 
-- HYM-018: Final testing — structured test pass across all tools and workflow
+```
+tests/
+├── conftest.py                  # OpenAI singleton reset
+├── test_schemas.py              # 17 tests — schema consistency across tools
+├── test_deduplication.py        # 14 tests — URL normalization and merge logic
+├── test_web_crawler.py          # 20 tests — graceful failure with mocked HTTP
+├── test_report_generator.py     # 12 tests — context assembly, missing key, file output
+└── test_missing_api_keys.py     #  9 tests — sys.exit vs RuntimeError vs warning
+```
+
+Run: `C:\Users\nest\.conda\envs\hymind\python.exe -m pytest tests/ -v`
+
+## Remaining
+
 - HYM-019: Demo preparation
-
-## Next Phase Candidates (post-testing)
-
-- PDF export
-- Telegram / Gmail delivery
-- Scheduled automation (n8n or cron)
-- RAG / vector memory
-- Parallelized collection nodes (LangGraph Send())
+- Next phase: PDF export, notifications, scheduling, RAG
