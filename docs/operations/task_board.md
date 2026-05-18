@@ -12,7 +12,7 @@
 | HYM-008 | Integrate NewsAPI | High | 2h | HYM-002 | Done |
 | HYM-009 | Implement RSS ingestion | Medium | 2h | HYM-002 | Done |
 | HYM-010 | Implement website crawler | Medium | 3h | HYM-002 | Done |
-| HYM-011 | Create LangGraph workflow | High | 4h | HYM-006,HYM-007,HYM-008 | Planned |
+| HYM-011 | Create LangGraph workflow | High | 4h | HYM-006,HYM-007,HYM-008 | Done |
 | HYM-012 | Create report generator | High | 3h | HYM-011 | Planned |
 | HYM-013 | Add retry logic | High | 2h | HYM-011 | Done |
 | HYM-014 | Add logging system | Medium | 2h | HYM-011 | Done |
