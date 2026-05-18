@@ -29,14 +29,14 @@ The system must:
 |---|---|
 | Language | Python |
 | Agent Framework | LangGraph |
-| Workflow Automation | n8n |
+| Workflow Automation | LangGraph core; n8n for Phase 6 distribution automation |
 | LLM | OpenAI |
 | Search | Serper API |
 | News | NewsAPI |
 | Vector Storage | ChromaDB or Pinecone |
 | Crawling | BeautifulSoup / Playwright |
-| Notifications | Gmail / Telegram |
-| Reports | Markdown / PDF |
+| Notifications | Gmail / Telegram (Phase 6) |
+| Reports | Markdown (core) / PDF (Phase 6) |
 
 ---
 
@@ -152,7 +152,8 @@ Allowed:
 - Web crawling
 - Basic RAG
 - Structured report generation
-- Telegram or Gmail notifications
+- Markdown report generation
+- Phase 6 delivery automation is deferred
 
 Not allowed during MVP:
 - Real time dashboards

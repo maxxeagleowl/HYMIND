@@ -6,7 +6,7 @@ The Hydrogen Engineering Intelligence Agent is an autonomous AI powered research
 
 The agent continuously researches external sources such as news platforms, RSS feeds, technical websites, government strategy publications, and competitor information. It autonomously analyzes and synthesizes findings into structured executive level reports and targeted business alerts.
 
-The project focuses on creating a production style autonomous research workflow using LangGraph, OpenAI, APIs, web crawling, RAG, and n8n orchestration.
+The project focuses on creating a production style autonomous research workflow using LangGraph, OpenAI, APIs, web crawling, and RAG, with n8n reserved for later distribution automation.
 
 ---
 
@@ -205,14 +205,14 @@ The system may monitor:
 | Programming Language | Python |
 | LLM | OpenAI API |
 | Agent Framework | LangGraph |
-| Workflow Automation | n8n |
+| Workflow Automation | LangGraph core; n8n for Phase 6 distribution automation |
 | Vector Database | Pinecone or ChromaDB |
 | Search API | Serper API |
 | News API | NewsAPI |
 | Financial Data | Alpha Vantage |
 | Web Crawling | BeautifulSoup / Playwright |
-| Notifications | Telegram / Gmail |
-| Report Generation | Markdown / PDF |
+| Notifications | Gmail / Telegram (Phase 6) |
+| Report Generation | Markdown (core) / PDF (Phase 6) |
 
 ---
 
@@ -221,7 +221,7 @@ The system may monitor:
 ## High Level Workflow
 
 ```text
-n8n Scheduled Trigger
+Scheduled Trigger
         ↓
 LangGraph Research Agent
         ↓
@@ -237,9 +237,9 @@ RAG Storage and Context Building
         ↓
 OpenAI Analysis and Synthesis
         ↓
-Executive Report Generation
+Markdown Report Generation
         ↓
-Telegram or Gmail Distribution
+Phase 6 n8n Distribution Layer
 ```
 
 ---
@@ -250,7 +250,7 @@ Telegram or Gmail Distribution
 
 The workflow starts through:
 
-- Scheduled n8n trigger
+- Scheduled trigger
 - Manual execution
 - Event based trigger
 
@@ -327,6 +327,8 @@ Reports are delivered through:
 - Telegram
 - PDF export
 - Markdown files
+
+The Markdown report is the core output. PDF, Gmail, and Telegram delivery are handled later by Phase 6 automation.
 
 ---
 

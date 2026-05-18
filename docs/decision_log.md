@@ -1,5 +1,6 @@
 # Decision Log
 
+- 2026-05-18: Moved distribution automation out of Phase 4. Phase 4 is now reserved for reliability, testing, validation, retry logic, error handling, logging, schema validation, and production hardening. Phase 6 now owns n8n orchestration, Markdown-to-PDF conversion, Gmail delivery, optional Telegram alerts, delivery logging, and report archiving so the core LangGraph/Python pipeline stays focused on research and synthesis.
 - 2026-05-18: Reorganized the docs directory into architecture, roadmap, operations, and planning subfolders while keeping `project_state.md` and `decision_log.md` in the docs root to preserve operational status tracking and decision history.
 - 2026-05-18: Moved the reporting standards document into `docs/operations/reporting_standards.md` and corrected the filename typo.
 - 2026-05-18: Split the skills directory into governance and operational categories to separate system behavior rules from domain execution rules.

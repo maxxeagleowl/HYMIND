@@ -6,7 +6,9 @@ HYMIND is an autonomous Hydrogen Engineering Intelligence Agent.
 
 The system continuously researches, analyzes, synthesizes, and distributes executive level hydrogen industry intelligence reports.
 
-The platform combines external data collection, AI powered analysis, structured report generation, and automated distribution workflows.
+The platform combines external data collection, AI powered analysis, structured report generation, and optional distribution workflows.
+
+The core Python/LangGraph pipeline ends at Markdown report generation. Phase 6 adds the external n8n distribution layer on top of that output.
 
 The architecture is designed for reliability, modularity, maintainability, and future extensibility.
 
@@ -17,7 +19,7 @@ The architecture is designed for reliability, modularity, maintainability, and f
 ```text
 Scheduled Trigger / Manual Input
                 ↓
-        n8n Orchestration Layer
+        Phase 6 n8n Distribution Layer
                 ↓
       LangGraph Research Workflow
                 ↓
@@ -77,11 +79,11 @@ The architecture prioritizes:
 
 # Main Components
 
-## 1. n8n Orchestration Layer
+## 1. Phase 6 n8n Distribution Layer
 
 ### Responsibility
 
-n8n manages orchestration and automation.
+n8n manages orchestration and automation for external delivery only.
 
 ### Responsibilities Include
 
@@ -225,7 +227,6 @@ Transform AI outputs into structured executive reports.
 ### Output Formats
 
 - Markdown
-- PDF
 
 ### Report Requirements
 
@@ -238,7 +239,7 @@ Reports must:
 
 ---
 
-# 8. Distribution Layer
+# 8. Phase 6 Distribution Layer
 
 ### Responsibility
 
@@ -406,8 +407,8 @@ docs/architecture/
 - multiple external data sources
 - basic RAG
 - LangGraph orchestration
-- n8n scheduling
-- Markdown/PDF reporting
+- Markdown reporting
+- Phase 6 distribution automation
 
 ---
 

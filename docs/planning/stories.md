@@ -33,6 +33,22 @@ Build an autonomous hydrogen engineering and market intelligence agent that gath
 - Add one or more sample executive reports.
 - Add a basic CLI or workflow trigger.
 
+## Phase 4 Stories
+
+| ID | User Story | Estimate | Dependencies | Definition of Done |
+| --- | --- | --- | --- | --- |
+| US-06 | As a developer, I want schema validation on workflow outputs so that malformed findings are rejected before production use. | 2 | US-05 | Validation rules are documented, automated tests cover invalid and valid output paths, and the workflow continues gracefully on validation failure. |
+| US-07 | As a developer, I want retry, timeout, logging, and error handling hardening so that the research pipeline survives transient failures. | 2 | US-05 | External integrations retry correctly, time out safely, log errors clearly, and preserve partial results without crashing. |
+| US-08 | As a developer, I want end-to-end reliability tests and a production hardening checklist so that release readiness is explicit. | 2 | US-06, US-07 | End-to-end success and failure paths are verified, the checklist is documented, and known risks are captured. |
+
+## Phase 6 Stories
+
+| ID | User Story | Estimate | Dependencies | Definition of Done |
+| --- | --- | --- | --- | --- |
+| US-09 | As an operator, I want an n8n workflow to trigger distribution from a completed Markdown report so that delivery starts only after the core research pipeline finishes. | 2 | US-08, completed Markdown report generation | The workflow reads an existing Markdown report path, triggers reliably, and logs each run. |
+| US-10 | As an operator, I want Markdown-to-PDF conversion and Gmail delivery so that executive reports can be distributed in a polished format. | 3 | US-09 | A PDF is generated into `outputs/`, Gmail delivery succeeds or retries cleanly, and delivery outcomes are logged. |
+| US-11 | As an operator, I want optional Telegram alerts, delivery logging, and archived workflow artifacts so that stakeholders and operators have lightweight notification and traceability. | 2 | US-09, US-10 | Telegram can be enabled or skipped safely, delivery logs are preserved, and reusable workflow JSON plus screenshots are documented. |
+
 ## Definition Of Done For The Phase
 
 - Repository is scaffolded cleanly.

@@ -2,7 +2,9 @@
 
 ## Purpose
 
-The research pipeline defines how HYMIND autonomously collects, processes, analyzes, and distributes hydrogen industry intelligence.
+The research pipeline defines how HYMIND autonomously collects, processes, analyzes, and prepares hydrogen industry intelligence for later distribution.
+
+The core Python/LangGraph workflow ends at Markdown report generation. Phase 6 adds the external n8n distribution layer, PDF conversion, Gmail delivery, and optional Telegram alerts.
 
 The workflow is designed for reliability, traceability, modularity, and production style operation.
 
@@ -25,7 +27,7 @@ AI Analysis
     ↓
 Report Generation
     ↓
-Distribution
+Phase 6 Distribution
     ↓
 Session Logging
 ```
@@ -44,7 +46,7 @@ Start the workflow automatically or manually.
 
 ### Scheduled Trigger
 
-Primary production workflow.
+Primary production workflow for the core research pipeline.
 
 Example:
 - Weekly executive report generation
@@ -52,7 +54,7 @@ Example:
 - Morning market scan
 
 Managed through:
-- n8n scheduler
+- Phase 6 n8n scheduler
 
 ---
 
@@ -433,21 +435,21 @@ Reports should include:
 
 ## Optional
 
-- PDF export
+- PDF export (Phase 6)
 
 ---
 
-# Step 8. Distribution Layer
+# Step 8. Phase 6 Distribution Layer
 
 ## Purpose
 
-Automatically deliver reports to stakeholders.
+Automatically deliver reports to stakeholders through Phase 6 automation.
 
 ---
 
 # Delivery Channels
 
-## Gmail
+## Phase 6 Gmail
 
 Used for:
 - executive distribution
@@ -456,7 +458,7 @@ Used for:
 
 ---
 
-## Telegram
+## Phase 6 Telegram
 
 Used for:
 - lightweight alerts
@@ -549,7 +551,7 @@ Track:
 - basic RAG
 - multi source collection
 - LangGraph orchestration
-- n8n scheduling
+- Phase 6 scheduling
 
 ---
 

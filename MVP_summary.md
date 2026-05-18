@@ -40,7 +40,7 @@ Excluded from the MVP:
 
 - Full production deployment
 - Real time dashboarding
-- Live notification distribution
+- Phase 6 distribution automation
 - Advanced long term RAG memory
 - Multi tenant support
 - Deep analytics and forecasting
@@ -315,7 +315,7 @@ This structure also allows future extension toward:
 - Human approval nodes
 - Multi agent routing
 - Long term memory systems
-- n8n orchestration integration
+- Phase 6 n8n distribution integration
 
 ---
 
@@ -335,12 +335,12 @@ This structure also allows future extension toward:
 
 ## Planned Next Steps
 
-- PDF report export
-- Telegram / Gmail distribution
+- Phase 6 PDF report export
+- Phase 6 Telegram / Gmail distribution
 - Persistent vector memory
 - Historical trend comparison
 - RAG integration
-- n8n orchestration
+- Phase 6 n8n orchestration
 - Advanced report formatting
 - Monitoring and logging
 

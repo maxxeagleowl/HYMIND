@@ -37,8 +37,16 @@ C:\Users\nest\.conda\envs\hymind\python.exe -m pip install pinecone
 
 ## Next Phase
 
-Phase 4 candidates:
-- Scheduled report delivery (Gmail or Telegram)
-- Trend analysis using RAG history (detect signal changes over time)
-- n8n workflow integration for scheduling
-- Parallelized collection nodes (LangGraph Send())
+Phase 4 focus:
+- Reliability and testing hardening
+- Retry logic, timeout handling, error handling
+- Logging and schema validation
+- Production hardening and validation coverage
+
+Phase 6 ownership:
+- n8n workflow integration
+- Markdown-to-PDF conversion
+- Gmail delivery
+- Optional Telegram alerts
+- Delivery logging and retry handling
+- Workflow JSON export and screenshots

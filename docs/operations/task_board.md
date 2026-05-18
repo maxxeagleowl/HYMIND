@@ -30,4 +30,9 @@
 | HYM-025 | Phase 3 RAG test suite (46 tests, no live API calls) | High | 2h | HYM-024 | Done |
 | HYM-026 | Phase 3 report generator RAG context injection | Medium | 1h | HYM-024 | Done |
 | HYM-027 | Phase 3 documentation (README, .env.example, decision log, task board) | Medium | 1h | HYM-025 | Done |
-| HYM-028 | Phase 4 scheduled report delivery (Telegram or Gmail) | Medium | 2h | HYM-027 | Planned |
+| HYM-028 | Phase 6 scheduled report delivery trigger (n8n) | Medium | 2h | HYM-012 | Planned |
+| HYM-029 | Phase 6 Markdown to PDF conversion | Medium | 3h | HYM-028 | Planned |
+| HYM-030 | Phase 6 Gmail delivery integration | Medium | 2h | HYM-029 | Planned |
+| HYM-031 | Phase 6 optional Telegram alert integration | Low | 1h | HYM-029 | Planned |
+| HYM-032 | Phase 6 delivery logging and retry handling | Medium | 2h | HYM-030,HYM-031 | Planned |
+| HYM-033 | Phase 6 n8n workflow JSON export and screenshots | Low | 1h | HYM-032 | Planned |

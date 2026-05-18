@@ -44,6 +44,7 @@ docs/
 - Reporting standards now live at `docs/operations/reporting_standards.md`.
 - Phase 2 adds: `src/hymind/tools/collector.py`, `tests/test_news_api_collector.py`, `docs/architecture/phase_2_research_foundation.md`.
 - Phase 3 adds: `src/hymind/rag/` (schemas, embeddings, pinecone_store, retriever), `tests/test_rag.py`, two new LangGraph nodes (`store_findings_in_pinecone`, `retrieve_context_from_pinecone`), `rag_context` field in AgentState, RAG context injection in report_generator.py.
+- Roadmap update: Phase 4 is now reliability, testing, schema validation, logging, and production hardening only; Phase 6 owns n8n, PDF generation, Gmail, Telegram, delivery logging, and report archiving.
 
 ## Skills Structure
 

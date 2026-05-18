@@ -14,9 +14,9 @@
 
 | Integration | Purpose | Status | Notes |
 |---|---|---|---|
-| Telegram or Gmail | Send report alerts | Planned | For Phase 3 operational delivery |
+| Telegram or Gmail | Send report alerts | Planned | For Phase 6 distribution automation |
 | ChromaDB or FAISS | Cross-run duplicate detection and retrieval | Planned | For Phase 3 RAG and memory |
-| n8n | Scheduling and orchestration | Planned | For Phase 3 automation |
+| n8n | Scheduling and orchestration | Planned | For Phase 6 automation |
 
 ---
 

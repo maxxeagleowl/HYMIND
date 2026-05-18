@@ -27,6 +27,7 @@ The sprint focuses on:
 - Logging and error handling
 - Initial LangGraph workflow
 - Modular project structure
+- Reliability and validation foundations
 
 ---
 
@@ -34,7 +35,7 @@ The sprint focuses on:
 
 - Full RAG implementation
 - Pinecone deployment
-- PDF export
+- PDF export and external distribution automation
 - Telegram integration
 - Gmail integration
 - SharePoint integration
@@ -66,6 +67,7 @@ The sprint focuses on:
 - Complete project documentation
 - Skills directory
 - Agile planning artifacts
+- Phase 6 distribution work remains separate from this sprint
 
 ---
 
