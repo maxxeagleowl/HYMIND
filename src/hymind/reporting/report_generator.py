@@ -10,6 +10,7 @@ from datetime import datetime
 from pathlib import Path
 
 from hymind.tools.openai_client import complete
+from hymind.reporting.validator import check_state_quality, validate_findings
 from hymind.utils.logger import get_logger
 from hymind.workflows.state import AgentState
 
@@ -274,10 +275,32 @@ def generate_report(
             "Add it to your .env file."
         )
 
-    logger.info("Report generation starting | topic=%r", topic)
+    logger.info("=== Report generation starting | topic=%r ===", topic)
+
+    # --- Validate findings before synthesis ---
+    raw_findings = state.get("merged_results", [])
+    valid_findings, validation = validate_findings(raw_findings)
+
+    quality = check_state_quality(state)
+    if not quality["can_generate_report"]:
+        logger.warning(
+            "generate_report: state quality check failed | errors=%s",
+            quality["errors"],
+        )
+    logger.info(
+        "generate_report: validation complete | total=%d | valid=%d"
+        " | duplicates=%d | missing_url=%d",
+        validation.total_input,
+        validation.valid_count,
+        validation.duplicate_count,
+        validation.missing_url_count,
+    )
+
+    # Use validated findings for context building
+    validated_state: AgentState = {**state, "merged_results": valid_findings}
 
     # --- Build context ---
-    context, source_count = build_context(state)
+    context, source_count = build_context(validated_state)
     logger.info(
         "Report context built | chars=%d | sources_in_context=%d",
         len(context),
@@ -322,7 +345,7 @@ def generate_report(
 
     char_count = len(full_report)
     logger.info(
-        "Report saved | path=%s | chars=%d | sources=%d",
+        "=== Report generation complete | path=%s | chars=%d | sources=%d ===",
         temp_path,
         char_count,
         source_count,

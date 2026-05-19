@@ -30,6 +30,12 @@
 | HYM-025 | Phase 3 RAG test suite (46 tests, no live API calls) | High | 2h | HYM-024 | Done |
 | HYM-026 | Phase 3 report generator RAG context injection | Medium | 1h | HYM-024 | Done |
 | HYM-027 | Phase 3 documentation (README, .env.example, decision log, task board) | Medium | 1h | HYM-025 | Done |
+| HYM-034 | Phase 4 output validation layer (validator.py) | High | 2h | HYM-027 | Done |
+| HYM-035 | Phase 4 failure scenario test suite (test_reliability.py) | High | 3h | HYM-034 | Done |
+| HYM-036 | Phase 4 validator unit tests (test_validator.py) | High | 1h | HYM-034 | Done |
+| HYM-037 | Phase 4 logging improvements (node START/END markers) | Medium | 1h | HYM-034 | Done |
+| HYM-038 | Phase 4 sample reports (3 reports in outputs/sample_reports/) | Medium | 2h | HYM-012 | Done |
+| HYM-039 | Phase 4 documentation update (project_state, decision_log, task_board, memory) | Medium | 1h | HYM-035 | Done |
 | HYM-028 | Phase 6 scheduled report delivery trigger (n8n) | Medium | 2h | HYM-012 | Planned |
 | HYM-029 | Phase 6 Markdown to PDF conversion | Medium | 3h | HYM-028 | Planned |
 | HYM-030 | Phase 6 Gmail delivery integration | Medium | 2h | HYM-029 | Planned |

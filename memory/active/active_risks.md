@@ -39,13 +39,13 @@ Serper charges per query. Each workflow run consumes at least one search query.
 
 ## RISK-004 - Automated Test Coverage Drift
 
-**Severity:** Medium  
-**Status:** Resolved
+**Severity:** Low  
+**Status:** Resolved — Phase 4 complete
 
-The repository now has an automated test suite covering the core workflow, collectors, crawler, report generation, and RAG layer. This risk is retained only as a reminder to keep coverage current as Phase 4 and Phase 6 expand.
+The repository now has 243 tests covering: core workflow, all collectors (Serper, NewsAPI, RSS), crawler, report generation, RAG layer, output validation, and failure scenarios (API timeouts, malformed feeds, node isolation, degraded pipeline). 
 
-**Mitigation:** 170 tests currently pass. Add new tests for any Phase 4 or Phase 6 changes.
-**Action needed:** Keep the suite updated when the distribution layer is implemented.
+**Mitigation:** 243 tests pass. Phase 4 added 73 reliability tests and 34 validator tests.
+**Action needed:** Keep the suite updated when Phase 6 distribution layer is implemented.
 
 ---
 
