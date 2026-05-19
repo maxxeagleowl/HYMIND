@@ -43,7 +43,7 @@ OpenAI Analysis & Synthesis
         ↓
 Markdown Executive Report
         ↓
-Phase 6 Distribution Layer [Optional]
+Phase 5 Distribution Layer [Optional]
         ↓
 PDF Generation
         ↓
@@ -293,7 +293,7 @@ Ensure the autonomous workflow operates reliably without manual intervention.
 
 ---
 
-# 9. Phase 6 Distribution Layer
+# 9. Phase 5 Distribution Layer
 
 The distribution layer is intentionally separated from the core intelligence pipeline.
 

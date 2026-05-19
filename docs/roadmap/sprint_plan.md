@@ -67,7 +67,7 @@ The sprint focuses on:
 - Complete project documentation
 - Skills directory
 - Agile planning artifacts
-- Phase 6 distribution work remains separate from this sprint
+- Phase 5 distribution work remains separate from this sprint
 
 ---
 

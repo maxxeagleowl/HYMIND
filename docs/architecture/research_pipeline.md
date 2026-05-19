@@ -4,7 +4,7 @@
 
 The research pipeline defines how HYMIND autonomously collects, processes, analyzes, and prepares hydrogen industry intelligence for later distribution.
 
-The core Python/LangGraph workflow ends at Markdown report generation. Phase 6 adds the external n8n distribution layer, PDF conversion, Gmail delivery, and optional Telegram alerts.
+The core Python/LangGraph workflow ends at Markdown report generation. Phase 5 adds the external n8n distribution layer, PDF conversion, Gmail delivery, and optional Telegram alerts.
 
 The workflow is designed for reliability, traceability, modularity, and production style operation.
 
@@ -27,7 +27,7 @@ AI Analysis
     ↓
 Report Generation
     ↓
-Phase 6 Distribution
+Phase 5 Distribution
     ↓
 Session Logging
 ```
@@ -54,7 +54,7 @@ Example:
 - Morning market scan
 
 Managed through:
-- Phase 6 n8n scheduler
+- Phase 5 n8n scheduler
 
 ---
 
@@ -435,21 +435,21 @@ Reports should include:
 
 ## Optional
 
-- PDF export (Phase 6)
+- PDF export (Phase 5)
 
 ---
 
-# Step 8. Phase 6 Distribution Layer
+# Step 8. Phase 5 Distribution Layer
 
 ## Purpose
 
-Automatically deliver reports to stakeholders through Phase 6 automation.
+Automatically deliver reports to stakeholders through Phase 5 automation.
 
 ---
 
 # Delivery Channels
 
-## Phase 6 Gmail
+## Phase 5 Gmail
 
 Used for:
 - executive distribution
@@ -458,7 +458,7 @@ Used for:
 
 ---
 
-## Phase 6 Telegram
+## Phase 5 Telegram
 
 Used for:
 - lightweight alerts
@@ -551,7 +551,7 @@ Track:
 - basic RAG
 - multi source collection
 - LangGraph orchestration
-- Phase 6 scheduling
+- Phase 5 scheduling
 
 ---
 

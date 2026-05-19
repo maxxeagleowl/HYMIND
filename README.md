@@ -26,7 +26,7 @@ HYMIND collects external market, technology, and policy signals from multiple so
 ---
 
 Phase 4 is reserved for reliability, validation, testing, logging, retry logic, and production hardening.
-Phase 6 owns the optional n8n distribution layer, PDF generation, Gmail delivery, Telegram alerts, and delivery logging.
+Phase 5 owns the optional n8n distribution layer, PDF generation, Gmail delivery, Telegram alerts, and delivery logging.
 
 ## Architecture Overview
 
@@ -66,7 +66,7 @@ flowchart TD
     R1 --> R2
 ```
 
-The core LangGraph pipeline ends at Markdown report generation. Phase 6 adds the optional n8n-based distribution layer on top of that output.
+The core LangGraph pipeline ends at Markdown report generation. Phase 5 adds the optional n8n-based distribution layer on top of that output.
 
 ---
 
@@ -319,4 +319,4 @@ HYMIND/
 - Generated reports land in `outputs/reports/` — excluded from git
 - Log files land in `logs/` — excluded from git
 - Keep changes small and focused; the workflow is the integration point
-- Phase 1 MVP is complete; Phase 6 adds PDF export, notifications, and scheduling
+- Phase 1 MVP is complete; Phase 5 adds PDF export, notifications, and scheduling

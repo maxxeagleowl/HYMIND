@@ -276,6 +276,37 @@ A task is only considered complete if:
 - Trend analysis
 - Operational hardening
 
+## Phase 4
+
+- Reliability hardening
+- Schema validation
+- Retry and exception handling
+- Failure scenario testing
+- Production hardening checklist
+
+## Phase 5
+
+- n8n distribution automation
+- Weekly scheduling
+- Execute Command integration (trigger Python agent)
+- Markdown-to-PDF conversion
+- Gmail delivery
+- Optional Telegram alerts
+- Delivery logging and retry handling
+- Archive automation
+- n8n workflow JSON export and screenshots
+
+## Phase 6
+
+- README finalization
+- Architecture documentation finalization
+- AGENTS.md and skills/ finalization
+- Deliverable validation against project requirements
+- Final sample report generation
+- Demo workflow preparation
+- Presentation material
+- Submission-ready repository review
+
 ---
 
 # Verification Rules

@@ -205,14 +205,14 @@ The system may monitor:
 | Programming Language | Python |
 | LLM | OpenAI API |
 | Agent Framework | LangGraph |
-| Workflow Automation | LangGraph core; n8n for Phase 6 distribution automation |
+| Workflow Automation | LangGraph core; n8n for Phase 5 distribution automation |
 | Vector Database | Pinecone or ChromaDB |
 | Search API | Serper API |
 | News API | NewsAPI |
 | Financial Data | Alpha Vantage |
 | Web Crawling | BeautifulSoup / Playwright |
-| Notifications | Gmail / Telegram (Phase 6) |
-| Report Generation | Markdown (core) / PDF (Phase 6) |
+| Notifications | Gmail / Telegram (Phase 5) |
+| Report Generation | Markdown (core) / PDF (Phase 5) |
 
 ---
 
@@ -239,7 +239,7 @@ OpenAI Analysis and Synthesis
         ↓
 Markdown Report Generation
         ↓
-Phase 6 n8n Distribution Layer
+Phase 5 n8n Distribution Layer
 ```
 
 ---
@@ -328,7 +328,7 @@ Reports are delivered through:
 - PDF export
 - Markdown files
 
-The Markdown report is the core output. PDF, Gmail, and Telegram delivery are handled later by Phase 6 automation.
+The Markdown report is the core output. PDF, Gmail, and Telegram delivery are handled later by Phase 5 automation.
 
 ---
 

@@ -24,6 +24,6 @@ Phase 4 reliability hardening complete.
 ## Operational Focus
 
 - Phase 4 is complete.
-- Phase 5 has not been formally defined. Candidate focus areas: performance monitoring, scheduled automation scaffolding, report archiving, operational dashboard.
-- Phase 6 owns n8n orchestration, Markdown-to-PDF conversion, Gmail delivery, optional Telegram alerts, delivery logging, and report archiving.
-- Core intelligence stays in Python/LangGraph; n8n is reserved for external delivery automation.
+- Phase 5 is Distribution Automation & PDF Reporting: n8n scheduling, Execute Command integration, Markdown-to-PDF conversion, Gmail delivery, optional Telegram alerts, delivery logging, archive automation, n8n workflow JSON export and screenshots.
+- Phase 6 is Documentation, Demo & Project Finalization: README finalization, architecture documentation, workflow diagrams, AGENTS.md finalization, deliverable validation, demo preparation, presentation material, submission-ready repository.
+- Core intelligence stays in Python/LangGraph; n8n is reserved for Phase 5 external delivery automation.

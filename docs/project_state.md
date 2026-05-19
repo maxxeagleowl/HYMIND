@@ -46,7 +46,7 @@ docs/
 - Phase 2 adds: `src/hymind/tools/collector.py`, `tests/test_news_api_collector.py`, `docs/architecture/phase_2_research_foundation.md`.
 - Phase 3 adds: `src/hymind/rag/` (schemas, embeddings, pinecone_store, retriever), `tests/test_rag.py`, two new LangGraph nodes (`store_findings_in_pinecone`, `retrieve_context_from_pinecone`), `rag_context` field in AgentState, RAG context injection in report_generator.py.
 - Phase 4 adds: `src/hymind/reporting/validator.py` (validate_findings, check_state_quality), `tests/test_reliability.py` (73 failure scenario tests), `tests/test_validator.py` (34 validator unit tests), 3 sample reports in `outputs/sample_reports/`, validator integration in report_generator.py, node-level START/END logging markers across all 9 workflow nodes.
-- Roadmap update: Phase 6 owns n8n, PDF generation, Gmail, Telegram, delivery logging, and report archiving.
+- Roadmap update: Phase 5 owns n8n, PDF generation, Gmail, Telegram, delivery logging, and report archiving. Phase 6 owns Documentation, Demo, and Project Finalization.
 
 ## Skills Structure
 

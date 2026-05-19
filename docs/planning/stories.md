@@ -41,13 +41,21 @@ Build an autonomous hydrogen engineering and market intelligence agent that gath
 | US-07 | As a developer, I want retry, timeout, logging, and error handling hardening so that the research pipeline survives transient failures. | 2 | US-05 | External integrations retry correctly, time out safely, log errors clearly, and preserve partial results without crashing. |
 | US-08 | As a developer, I want end-to-end reliability tests and a production hardening checklist so that release readiness is explicit. | 2 | US-06, US-07 | End-to-end success and failure paths are verified, the checklist is documented, and known risks are captured. |
 
-## Phase 6 Stories
+## Phase 5 Stories
 
 | ID | User Story | Estimate | Dependencies | Definition of Done |
 | --- | --- | --- | --- | --- |
 | US-09 | As an operator, I want an n8n workflow to trigger distribution from a completed Markdown report so that delivery starts only after the core research pipeline finishes. | 2 | US-08, completed Markdown report generation | The workflow reads an existing Markdown report path, triggers reliably, and logs each run. |
 | US-10 | As an operator, I want Markdown-to-PDF conversion and Gmail delivery so that executive reports can be distributed in a polished format. | 3 | US-09 | A PDF is generated into `outputs/`, Gmail delivery succeeds or retries cleanly, and delivery outcomes are logged. |
 | US-11 | As an operator, I want optional Telegram alerts, delivery logging, and archived workflow artifacts so that stakeholders and operators have lightweight notification and traceability. | 2 | US-09, US-10 | Telegram can be enabled or skipped safely, delivery logs are preserved, and reusable workflow JSON plus screenshots are documented. |
+
+## Phase 6 Stories
+
+| ID | User Story | Estimate | Dependencies | Definition of Done |
+| --- | --- | --- | --- | --- |
+| US-12 | As a developer, I want a finalized README and complete architecture documentation so that any reviewer or instructor can understand and reproduce the system. | 2 | US-11 | README covers setup, configuration, architecture, and run instructions. Architecture diagrams are accurate and current. |
+| US-13 | As a developer, I want all AGENTS.md files, skills/, and planning artifacts finalized so that the agent-facing specification and Agile artifacts meet submission requirements. | 1 | US-12 | AGENTS.md reflects final system state, skills/ is complete, stories.md has estimates and definitions of done for every phase. |
+| US-14 | As a developer, I want a working end-to-end demo and presentation material so that the project can be demonstrated professionally in 5–7 minutes. | 2 | US-12, US-13 | Demo runs without error from trigger to report, presentation covers architecture decisions and reliability features, repository is submission-ready. |
 
 ## Definition Of Done For The Phase
 

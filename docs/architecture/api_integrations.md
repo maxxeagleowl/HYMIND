@@ -534,7 +534,7 @@ The core research intelligence pipeline intentionally remains inside Python and 
 
 ## Planned Usage
 
-Phase 6 introduces:
+Phase 5 introduces:
 
 - Workflow scheduling
 - Report distribution

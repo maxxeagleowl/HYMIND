@@ -41,12 +41,22 @@ C:\Users\nest\.conda\envs\hymind\python.exe -m pytest tests/test_reliability.py 
 
 ## Next Phase
 
-Phase 5 (not yet defined): candidate areas — operational monitoring, scheduled automation scaffolding, report archiving.
+**Phase 5: Distribution Automation & PDF Reporting**
 
-Phase 6 ownership:
-- n8n workflow integration
+- n8n weekly schedule automation
+- Execute Command integration (trigger Python agent from n8n)
 - Markdown-to-PDF conversion
-- Gmail delivery
-- Optional Telegram alerts
+- Gmail delivery workflow
+- Optional Telegram alert integration
 - Delivery logging and retry handling
-- Workflow JSON export and screenshots
+- Archive automation
+- n8n workflow JSON export and screenshots
+
+**Phase 6: Documentation, Demo & Project Finalization**
+
+- Finalize README.md and architecture documentation
+- Finalize AGENTS.md and skills/ documentation
+- Generate final sample reports
+- Validate all deliverables against project requirements
+- Prepare demo workflow and presentation material
+- Final submission review and repository cleanup

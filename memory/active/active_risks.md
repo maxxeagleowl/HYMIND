@@ -45,7 +45,7 @@ Serper charges per query. Each workflow run consumes at least one search query.
 The repository now has 243 tests covering: core workflow, all collectors (Serper, NewsAPI, RSS), crawler, report generation, RAG layer, output validation, and failure scenarios (API timeouts, malformed feeds, node isolation, degraded pipeline). 
 
 **Mitigation:** 243 tests pass. Phase 4 added 73 reliability tests and 34 validator tests.
-**Action needed:** Keep the suite updated when Phase 6 distribution layer is implemented.
+**Action needed:** Keep the suite updated when Phase 5 distribution layer is implemented.
 
 ---
 
@@ -105,12 +105,12 @@ Vector IDs are derived from a hash of the URL. Re-running the pipeline for the s
 
 ---
 
-## RISK-010 - Phase 6 Delivery Automation Regression
+## RISK-010 - Phase 5 Distribution Automation Regression
 
 **Severity:** Medium  
 **Status:** Open
 
-The Phase 6 n8n/PDF/Gmail/Telegram delivery layer introduces new failure modes around file generation, workflow triggers, and external delivery APIs.
+The Phase 5 n8n/PDF/Gmail/Telegram distribution layer introduces new failure modes around file generation, workflow triggers, and external delivery APIs.
 
-**Mitigation:** Keep Phase 6 isolated from the core LangGraph pipeline and require logging, retries, and archive checks in the workflow design.
+**Mitigation:** Keep Phase 5 isolated from the core LangGraph pipeline and require logging, retries, and archive checks in the workflow design.
 **Action needed:** Validate delivery retries, PDF generation, and report archiving before enabling production use.

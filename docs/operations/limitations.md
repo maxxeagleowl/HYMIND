@@ -203,7 +203,7 @@ Possible future additions:
 
 The current MVP generates structured Markdown reports.
 
-Phase 6 distribution automation is architecturally defined but not yet fully implemented.
+Phase 5 distribution automation is architecturally defined but not yet fully implemented.
 
 ---
 
@@ -234,7 +234,7 @@ Current MVP focus:
 
 ## Future Direction
 
-Phase 6 introduces:
+Phase 5 introduces:
 
 - n8n orchestration
 - Markdown to PDF workflows

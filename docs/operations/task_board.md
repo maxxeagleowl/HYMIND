@@ -36,9 +36,15 @@
 | HYM-037 | Phase 4 logging improvements (node START/END markers) | Medium | 1h | HYM-034 | Done |
 | HYM-038 | Phase 4 sample reports (3 reports in outputs/sample_reports/) | Medium | 2h | HYM-012 | Done |
 | HYM-039 | Phase 4 documentation update (project_state, decision_log, task_board, memory) | Medium | 1h | HYM-035 | Done |
-| HYM-028 | Phase 6 scheduled report delivery trigger (n8n) | Medium | 2h | HYM-012 | Planned |
-| HYM-029 | Phase 6 Markdown to PDF conversion | Medium | 3h | HYM-028 | Planned |
-| HYM-030 | Phase 6 Gmail delivery integration | Medium | 2h | HYM-029 | Planned |
-| HYM-031 | Phase 6 optional Telegram alert integration | Low | 1h | HYM-029 | Planned |
-| HYM-032 | Phase 6 delivery logging and retry handling | Medium | 2h | HYM-030,HYM-031 | Planned |
-| HYM-033 | Phase 6 n8n workflow JSON export and screenshots | Low | 1h | HYM-032 | Planned |
+| HYM-028 | Phase 5 n8n scheduled report delivery trigger | Medium | 2h | HYM-039 | Planned |
+| HYM-029 | Phase 5 Markdown to PDF conversion | Medium | 3h | HYM-028 | Planned |
+| HYM-030 | Phase 5 Gmail delivery integration | Medium | 2h | HYM-029 | Planned |
+| HYM-031 | Phase 5 optional Telegram alert integration | Low | 1h | HYM-029 | Planned |
+| HYM-032 | Phase 5 delivery logging and retry handling | Medium | 2h | HYM-030,HYM-031 | Planned |
+| HYM-033 | Phase 5 n8n workflow JSON export and screenshots | Low | 1h | HYM-032 | Planned |
+| HYM-040 | Phase 6 finalize README.md and architecture documentation | Medium | 2h | HYM-033 | Planned |
+| HYM-041 | Phase 6 finalize AGENTS.md and skills/ documentation | Medium | 1h | HYM-040 | Planned |
+| HYM-042 | Phase 6 generate final sample reports | Medium | 2h | HYM-040 | Planned |
+| HYM-043 | Phase 6 validate all deliverables against project requirements | High | 2h | HYM-042 | Planned |
+| HYM-044 | Phase 6 prepare demo workflow and presentation material | Medium | 3h | HYM-043 | Planned |
+| HYM-045 | Phase 6 final submission review and repository cleanup | High | 1h | HYM-044 | Planned |
