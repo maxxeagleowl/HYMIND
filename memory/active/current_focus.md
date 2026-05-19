@@ -2,9 +2,31 @@
 
 ## Status
 
-**Phase 4 Complete**
+**Phase 5 — API Wrapper Complete**
 
-Phase 4 reliability hardening is implemented, tested (243 tests, all pass), and documented.
+The FastAPI HTTP wrapper is implemented and documented. n8n can now call `POST /run-hymind` via ngrok and receive the full Markdown report content in the response.
+
+## Phase 5 API Deliverables
+
+| Component | File(s) | Status |
+|---|---|---|
+| FastAPI server | `src/hymind/api/server.py` | Done |
+| Start script | `scripts/run_api.py` | Done |
+| Dependencies | `requirements.txt` (+fastapi, uvicorn) | Done |
+| Auth env var | `.env.example` (HYMIND_API_KEY) | Done |
+| README section | `README.md` (Phase 5 API/ngrok/n8n) | Done |
+| Workflow docs | `docs/operations/workflow_documentation.md` | Done |
+
+## Remaining Phase 5 Work
+
+- HYM-028: n8n scheduled report delivery trigger (workflow JSON, screenshots)
+- HYM-029: Markdown-to-PDF conversion
+- HYM-030: Gmail delivery integration
+- HYM-031: Optional Telegram alert integration
+- HYM-032: Delivery logging and retry handling
+- HYM-033: n8n workflow JSON export and screenshots
+
+## Phase 4 Summary (completed)
 
 ## Phase 4 Deliverables
 

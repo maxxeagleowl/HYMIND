@@ -13,3 +13,5 @@ tenacity
 rich
 pinecone
 pytest
+fastapi
+uvicorn[standard]

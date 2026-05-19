@@ -36,7 +36,9 @@
 | HYM-037 | Phase 4 logging improvements (node START/END markers) | Medium | 1h | HYM-034 | Done |
 | HYM-038 | Phase 4 sample reports (3 reports in outputs/sample_reports/) | Medium | 2h | HYM-012 | Done |
 | HYM-039 | Phase 4 documentation update (project_state, decision_log, task_board, memory) | Medium | 1h | HYM-035 | Done |
-| HYM-028 | Phase 5 n8n scheduled report delivery trigger | Medium | 2h | HYM-039 | Planned |
+| HYM-046 | Phase 5 FastAPI HTTP wrapper (src/hymind/api/server.py) | High | 2h | HYM-039 | Done |
+| HYM-047 | Phase 5 ngrok + n8n integration documentation | Medium | 1h | HYM-046 | Done |
+| HYM-028 | Phase 5 n8n scheduled report delivery trigger | Medium | 2h | HYM-047 | Planned |
 | HYM-029 | Phase 5 Markdown to PDF conversion | Medium | 3h | HYM-028 | Planned |
 | HYM-030 | Phase 5 Gmail delivery integration | Medium | 2h | HYM-029 | Planned |
 | HYM-031 | Phase 5 optional Telegram alert integration | Low | 1h | HYM-029 | Planned |

@@ -313,10 +313,132 @@ HYMIND/
 
 ---
 
+## Phase 5 — API Server and n8n Integration
+
+HYMIND exposes a FastAPI HTTP wrapper so n8n (or any HTTP client) can trigger
+a research run and receive the Markdown report content in the response.
+
+### Start the API server locally
+
+```powershell
+# Install new dependencies first (one-time)
+C:\Users\nest\.conda\envs\hymind\python.exe -m pip install fastapi "uvicorn[standard]"
+
+# Start the server
+uvicorn src.hymind.api.server:app --host 0.0.0.0 --port 8000 --reload
+
+# Alternative: use the convenience script
+C:\Users\nest\.conda\envs\hymind\python.exe scripts/run_api.py
+```
+
+The server starts at `http://localhost:8000`.  The interactive docs are at
+`http://localhost:8000/docs`.
+
+### Test the endpoint locally
+
+```powershell
+curl -X POST "http://localhost:8000/run-hymind" `
+  -H "Content-Type: application/json" `
+  -d "{\"topic\":\"weekly hydrogen and fuel cell market intelligence\",\"report_type\":\"weekly_executive\",\"run_mode\":\"manual\"}"
+```
+
+Liveness check:
+
+```powershell
+curl http://localhost:8000/health
+```
+
+### Expose to n8n via ngrok
+
+n8n cannot reach `localhost` directly.  Use ngrok to create a public tunnel:
+
+```powershell
+# Install ngrok from https://ngrok.com/download, then:
+ngrok http 8000
+```
+
+ngrok prints a public URL like `https://abc123.ngrok-free.app`.  Use that URL
+in the n8n HTTP Request node.
+
+### n8n HTTP Request node configuration
+
+| Field | Value |
+|---|---|
+| Method | `POST` |
+| URL | `https://YOUR-NGROK-URL.ngrok-free.app/run-hymind` |
+| Body Content Type | `JSON` |
+| Authentication | None (or Header Auth if `HYMIND_API_KEY` is set) |
+
+Request body:
+
+```json
+{
+  "topic": "weekly hydrogen and fuel cell market intelligence",
+  "report_type": "weekly_executive",
+  "run_mode": "scheduled"
+}
+```
+
+Success condition for n8n IF node:
+
+```
+{{$json.status}} equals success
+```
+
+Gmail body expression (passes the full Markdown report):
+
+```
+{{$json.report_content}}
+```
+
+### API response
+
+Success:
+
+```json
+{
+  "status": "success",
+  "report_title": "HYMIND Executive Intelligence Report",
+  "report_content": "# Markdown report content...",
+  "report_path": "outputs/reports/20260519_080500_hymind_report.md",
+  "generated_at": "2026-05-19T08:05:00+00:00"
+}
+```
+
+Failure:
+
+```json
+{
+  "status": "failed",
+  "error": "OPENAI_API_KEY is not set — report generation requires OpenAI.",
+  "generated_at": "2026-05-19T08:05:00+00:00"
+}
+```
+
+### Optional API key authentication
+
+Set `HYMIND_API_KEY` in `.env` to protect the endpoint:
+
+```env
+HYMIND_API_KEY=your-secret-key
+```
+
+When set, every request must include the header:
+
+```
+x-api-key: your-secret-key
+```
+
+In n8n: add a Header Auth credential with the key `x-api-key` and your value.
+
+Leave `HYMIND_API_KEY` empty for unauthenticated local development.
+
+---
+
 ## Development Notes
 
 - Do not commit `.env` or any file containing real API keys
 - Generated reports land in `outputs/reports/` — excluded from git
 - Log files land in `logs/` — excluded from git
 - Keep changes small and focused; the workflow is the integration point
-- Phase 1 MVP is complete; Phase 5 adds PDF export, notifications, and scheduling
+- Phase 1–4 MVP is complete; Phase 5 adds the API wrapper, n8n scheduling, PDF export, and Gmail delivery

@@ -2,7 +2,19 @@
 
 ## Current State
 
-Phase 4 reliability hardening complete.
+Phase 5 — FastAPI HTTP wrapper complete.
+
+- `src/hymind/api/server.py` created: FastAPI server with `POST /run-hymind` and `GET /health`
+- `src/hymind/api/__init__.py` created
+- `scripts/run_api.py` created: convenience uvicorn start script
+- `requirements.txt` updated: added `fastapi`, `uvicorn[standard]`
+- `.env.example` updated: added `HYMIND_API_KEY` (optional auth)
+- `README.md` updated: added Phase 5 API/ngrok/n8n integration section
+- `docs/operations/workflow_documentation.md` created: full endpoint, ngrok, n8n, and troubleshooting docs
+
+The API wraps `run_research()` + `generate_report()` via `run_hymind_agent()`. No core agent logic was changed.
+
+## Previous State (Phase 4 complete)
 
 - `src/hymind/reporting/validator.py` created: `validate_findings()` and `check_state_quality()` functions
 - `tests/test_reliability.py` created: 73 failure scenario tests covering RSS failures, Serper failures, NewsAPI failures, workflow node isolation, finalize_state edge cases, OpenAI failure propagation, degraded pipeline scenarios
