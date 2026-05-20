@@ -27,6 +27,7 @@ outputs/reports/*
 !outputs/sample_reports/
 outputs/sample_reports/*
 !outputs/sample_reports/*.md
+!outputs/*.pptx
 caches/
 temp/
 
