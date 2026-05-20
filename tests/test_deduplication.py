@@ -2,8 +2,8 @@
 
 import pytest
 
-from hymind.workflows.research_workflow import _normalize_url, merge_and_deduplicate
-from hymind.workflows.state import initial_state
+from workflows.research_workflow import _normalize_url, merge_and_deduplicate
+from workflows.state import initial_state
 
 
 # ---------------------------------------------------------------------------

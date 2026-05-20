@@ -18,7 +18,7 @@ The shared 9-field normalized schema:
 import re
 from typing import Any, Protocol, runtime_checkable
 
-from hymind.utils.logger import get_logger
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -41,8 +41,8 @@ class CollectorProtocol(Protocol):
     primary implementors.
 
     Current implementors:
-        hymind.tools.news_api.search
-        hymind.tools.serper_search.search
+        tools.news_api.search
+        tools.serper_search.search
 
     Planned future implementors:
         Serper news type, additional news sources, domain-specific crawlers.

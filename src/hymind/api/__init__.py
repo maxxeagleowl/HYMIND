@@ -1,1 +1,0 @@
-# HYMIND API package

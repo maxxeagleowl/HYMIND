@@ -4,7 +4,7 @@ Usage:
     C:\Users\nest\.conda\envs\hymind\python.exe scripts/run_api.py
 
 Or directly with uvicorn:
-    uvicorn src.hymind.api.server:app --host 0.0.0.0 --port 8000 --reload
+    uvicorn src.api.server:app --host 0.0.0.0 --port 8000 --reload
 
 Then expose to n8n via ngrok (fixed domain):
     ngrok http --domain=take-jury-plot.ngrok-free.dev 8000
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     subprocess.run(
         [
             sys.executable, "-m", "uvicorn",
-            "src.hymind.api.server:app",
+            "src.api.server:app",
             "--host", "0.0.0.0",
             "--port", "8000",
             "--reload",

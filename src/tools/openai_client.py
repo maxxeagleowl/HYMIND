@@ -14,7 +14,7 @@ from tenacity import (
     before_sleep_log,
 )
 
-from hymind.utils.logger import get_logger
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
 

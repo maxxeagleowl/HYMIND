@@ -1,7 +1,7 @@
 """Shared pytest fixtures for the HYMIND test suite."""
 
 import pytest
-import hymind.tools.openai_client as _oai
+import tools.openai_client as _oai
 
 
 @pytest.fixture(autouse=True)

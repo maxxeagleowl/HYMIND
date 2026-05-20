@@ -1,8 +1,8 @@
 """HYMIND entry point — full research and report pipeline.
 
 Usage:
-    python -m hymind.main
-    python -m hymind.main "hydrogen funding Germany 2026"
+    python -m main
+    python -m main "hydrogen funding Germany 2026"
 """
 
 import sys
@@ -11,9 +11,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from hymind.utils.logger import get_logger
-from hymind.workflows.research_workflow import run_research
-from hymind.reporting.report_generator import generate_report
+from utils.logger import get_logger
+from workflows.research_workflow import run_research
+from reporting.report_generator import generate_report
 
 logger = get_logger("hymind.main")
 
@@ -66,7 +66,7 @@ def smoke_test_workflow(topic: str = _DEFAULT_TOPIC) -> None:
 
 def smoke_test_crawler() -> None:
     """Validate web crawler."""
-    from hymind.tools.web_crawler import crawl_many
+    from tools.web_crawler import crawl_many
 
     urls = [
         "https://www.prnewswire.com/news-releases/hydrogen-sensor-market-worth-0-16-billion-by-2032---exclusive-report-by-marketsandmarkets-302773274.html",
@@ -80,7 +80,7 @@ def smoke_test_crawler() -> None:
 
 def smoke_test_rss() -> None:
     """Validate RSS ingestion."""
-    from hymind.tools.rss_reader import read_feed, DEFAULT_HYDROGEN_FEEDS
+    from tools.rss_reader import read_feed, DEFAULT_HYDROGEN_FEEDS
 
     total = sum(len(read_feed(url, topic="hydrogen")) for url in DEFAULT_HYDROGEN_FEEDS)
     print(f"\n[HYMIND] RSS smoke test | total={total} results")
@@ -88,7 +88,7 @@ def smoke_test_rss() -> None:
 
 def smoke_test_newsapi() -> None:
     """Validate NewsAPI integration."""
-    from hymind.tools.news_api import search as news_search
+    from tools.news_api import search as news_search
 
     results = news_search("hydrogen fuel cell Europe", num_results=10)
     print(f"\n[HYMIND] NewsAPI smoke test | results={len(results)}")
@@ -96,7 +96,7 @@ def smoke_test_newsapi() -> None:
 
 def smoke_test_serper() -> None:
     """Validate Serper search integration."""
-    from hymind.tools.serper_search import search as serper_search
+    from tools.serper_search import search as serper_search
 
     results = serper_search("hydrogen fuel cell market Europe 2026", num_results=10)
     print(f"\n[HYMIND] Serper smoke test | results={len(results)}")
@@ -104,7 +104,7 @@ def smoke_test_serper() -> None:
 
 def smoke_test_openai() -> None:
     """Validate OpenAI integration."""
-    from hymind.tools.openai_client import complete
+    from tools.openai_client import complete
 
     response = complete("In one sentence, confirm you are functioning.", max_tokens=60)
     print(f"\n[HYMIND] OpenAI smoke test | response={response}")

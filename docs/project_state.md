@@ -43,9 +43,10 @@ docs/
 - Memory behavior remains in `memory/` and is unchanged.
 - Internal references should use the new subfolder paths above.
 - Reporting standards now live at `docs/operations/reporting_standards.md`.
-- Phase 2 adds: `src/hymind/tools/collector.py`, `tests/test_news_api_collector.py`, `docs/architecture/phase_2_research_foundation.md`.
-- Phase 3 adds: `src/hymind/rag/` (schemas, embeddings, pinecone_store, retriever), `tests/test_rag.py`, two new LangGraph nodes (`store_findings_in_pinecone`, `retrieve_context_from_pinecone`), `rag_context` field in AgentState, RAG context injection in report_generator.py.
-- Phase 4 adds: `src/hymind/reporting/validator.py` (validate_findings, check_state_quality), `tests/test_reliability.py` (73 failure scenario tests), `tests/test_validator.py` (34 validator unit tests), 3 sample reports in `outputs/sample_reports/`, validator integration in report_generator.py, node-level START/END logging markers across all 9 workflow nodes.
+- Phase 2 adds: `src/tools/collector.py`, `tests/test_news_api_collector.py`, `docs/architecture/phase_2_research_foundation.md`.
+- Phase 3 adds: `src/rag/` (schemas, embeddings, pinecone_store, retriever), `tests/test_rag.py`, two new LangGraph nodes (`store_findings_in_pinecone`, `retrieve_context_from_pinecone`), `rag_context` field in AgentState, RAG context injection in report_generator.py.
+- Phase 4 adds: `src/reporting/validator.py` (validate_findings, check_state_quality), `tests/test_reliability.py` (73 failure scenario tests), `tests/test_validator.py` (34 validator unit tests), 3 sample reports in `outputs/sample_reports/`, validator integration in report_generator.py, node-level START/END logging markers across all 9 workflow nodes.
+- Structural refactor (2026-05-20): removed `src/hymind/` nesting — all modules now live directly under `src/`. Import paths flattened: `from X import Y` (was `from hymind.X import Y`). 243 tests pass.
 - Roadmap update: Phase 5 owns n8n, PDF generation, Gmail, Telegram, delivery logging, and report archiving. Phase 6 owns Documentation, Demo, and Project Finalization.
 
 ## Skills Structure

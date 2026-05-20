@@ -7,7 +7,7 @@ without patching the openai module globally.
 import os
 from typing import Any, Optional
 
-from hymind.utils.logger import get_logger
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
 

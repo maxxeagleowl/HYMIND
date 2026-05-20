@@ -5,7 +5,7 @@ call to trigger a full research + report run and receive the Markdown report
 content in the JSON response.
 
 Start locally:
-    uvicorn src.hymind.api.server:app --host 0.0.0.0 --port 8000 --reload
+    uvicorn src.api.server:app --host 0.0.0.0 --port 8000 --reload
 
 Expose to n8n via ngrok:
     ngrok http 8000
@@ -22,9 +22,9 @@ from pydantic import BaseModel, Field
 
 load_dotenv()
 
-from hymind.utils.logger import get_logger
-from hymind.workflows.research_workflow import run_research
-from hymind.reporting.report_generator import generate_report
+from utils.logger import get_logger
+from workflows.research_workflow import run_research
+from reporting.report_generator import generate_report
 
 logger = get_logger("hymind.api")
 

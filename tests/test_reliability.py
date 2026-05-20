@@ -16,7 +16,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 import requests
 
-from hymind.workflows.state import initial_state
+from workflows.state import initial_state
 
 
 # ---------------------------------------------------------------------------
@@ -27,35 +27,35 @@ class TestRSSReaderFailures:
     """read_feed must return [] on any per-feed failure — never raise."""
 
     def test_feed_timeout_returns_empty(self):
-        from hymind.tools.rss_reader import read_feed
-        with patch("hymind.tools.rss_reader._fetch_content", side_effect=requests.Timeout()):
+        from tools.rss_reader import read_feed
+        with patch("tools.rss_reader._fetch_content", side_effect=requests.Timeout()):
             result = read_feed("https://example.com/feed.xml", topic="hydrogen")
         assert result == []
 
     def test_feed_connection_error_returns_empty(self):
-        from hymind.tools.rss_reader import read_feed
+        from tools.rss_reader import read_feed
         with patch(
-            "hymind.tools.rss_reader._fetch_content",
+            "tools.rss_reader._fetch_content",
             side_effect=requests.ConnectionError("no route"),
         ):
             result = read_feed("https://example.com/feed.xml", topic="hydrogen")
         assert result == []
 
     def test_feed_http_error_returns_empty(self):
-        from hymind.tools.rss_reader import read_feed
+        from tools.rss_reader import read_feed
         mock_resp = MagicMock()
         mock_resp.status_code = 503
         with patch(
-            "hymind.tools.rss_reader._fetch_content",
+            "tools.rss_reader._fetch_content",
             side_effect=requests.HTTPError(response=mock_resp),
         ):
             result = read_feed("https://example.com/feed.xml", topic="hydrogen")
         assert result == []
 
     def test_unexpected_exception_returns_empty(self):
-        from hymind.tools.rss_reader import read_feed
+        from tools.rss_reader import read_feed
         with patch(
-            "hymind.tools.rss_reader._fetch_content",
+            "tools.rss_reader._fetch_content",
             side_effect=RuntimeError("unexpected"),
         ):
             result = read_feed("https://example.com/feed.xml", topic="hydrogen")
@@ -64,7 +64,7 @@ class TestRSSReaderFailures:
     def test_malformed_feed_still_processes_valid_entries(self):
         """feedparser bozo=True must not skip processing — entries may still be valid."""
         import feedparser
-        from hymind.tools.rss_reader import read_feed
+        from tools.rss_reader import read_feed
 
         valid_entry = MagicMock()
         valid_entry.get = lambda k, d=None: {
@@ -82,7 +82,7 @@ class TestRSSReaderFailures:
         mock_parsed.feed.title = "Test Feed"
         mock_parsed.entries = [valid_entry]
 
-        with patch("hymind.tools.rss_reader._fetch_content", return_value=b"<rss/>"):
+        with patch("tools.rss_reader._fetch_content", return_value=b"<rss/>"):
             with patch("feedparser.parse", return_value=mock_parsed):
                 result = read_feed("https://bad-feed.com/rss", topic="hydrogen")
 
@@ -91,7 +91,7 @@ class TestRSSReaderFailures:
 
     def test_empty_feed_returns_empty_list(self):
         import feedparser
-        from hymind.tools.rss_reader import read_feed
+        from tools.rss_reader import read_feed
 
         mock_parsed = MagicMock(spec=feedparser.FeedParserDict)
         mock_parsed.bozo = False
@@ -99,7 +99,7 @@ class TestRSSReaderFailures:
         mock_parsed.feed.title = "Empty Feed"
         mock_parsed.entries = []
 
-        with patch("hymind.tools.rss_reader._fetch_content", return_value=b"<rss/>"):
+        with patch("tools.rss_reader._fetch_content", return_value=b"<rss/>"):
             with patch("feedparser.parse", return_value=mock_parsed):
                 result = read_feed("https://example.com/empty-feed", topic="hydrogen")
 
@@ -107,7 +107,7 @@ class TestRSSReaderFailures:
 
     def test_read_feeds_continues_after_one_feed_fails(self):
         """read_feeds must process all feeds even if the first times out."""
-        from hymind.tools.rss_reader import read_feeds
+        from tools.rss_reader import read_feeds
 
         call_count = 0
 
@@ -125,7 +125,7 @@ class TestRSSReaderFailures:
         mock_parsed.feed.title = "Feed 2"
         mock_parsed.entries = []
 
-        with patch("hymind.tools.rss_reader._fetch_content", side_effect=side_effect):
+        with patch("tools.rss_reader._fetch_content", side_effect=side_effect):
             with patch("feedparser.parse", return_value=mock_parsed):
                 result = read_feeds(
                     ["https://feed1.com/rss", "https://feed2.com/rss"],
@@ -136,7 +136,7 @@ class TestRSSReaderFailures:
         assert isinstance(result, list)
 
     def test_read_feeds_empty_url_list_returns_empty(self):
-        from hymind.tools.rss_reader import read_feeds
+        from tools.rss_reader import read_feeds
         assert read_feeds([], topic="hydrogen") == []
 
 
@@ -148,7 +148,7 @@ class TestSerperSearchFailures:
     """Serper failures should raise specific exceptions (retried by tenacity)."""
 
     def test_rate_limit_raises_serper_rate_limit_error(self):
-        from hymind.tools.serper_search import search, SerperRateLimitError
+        from tools.serper_search import search, SerperRateLimitError
 
         mock_resp = MagicMock()
         mock_resp.status_code = 429
@@ -160,7 +160,7 @@ class TestSerperSearchFailures:
                     search("hydrogen fuel cell")
 
     def test_server_error_raises_serper_server_error(self):
-        from hymind.tools.serper_search import search, SerperServerError
+        from tools.serper_search import search, SerperServerError
 
         mock_resp = MagicMock()
         mock_resp.status_code = 503
@@ -172,7 +172,7 @@ class TestSerperSearchFailures:
                     search("hydrogen fuel cell")
 
     def test_empty_query_returns_empty_without_api_call(self):
-        from hymind.tools.serper_search import search
+        from tools.serper_search import search
 
         with patch.dict(os.environ, {"SERPER_API_KEY": "test-key"}):
             with patch("requests.post") as mock_post:
@@ -181,7 +181,7 @@ class TestSerperSearchFailures:
         mock_post.assert_not_called()
 
     def test_whitespace_only_query_returns_empty_without_api_call(self):
-        from hymind.tools.serper_search import search
+        from tools.serper_search import search
 
         with patch.dict(os.environ, {"SERPER_API_KEY": "test-key"}):
             with patch("requests.post") as mock_post:
@@ -190,7 +190,7 @@ class TestSerperSearchFailures:
         mock_post.assert_not_called()
 
     def test_zero_results_returns_empty_list(self):
-        from hymind.tools.serper_search import search
+        from tools.serper_search import search
 
         mock_resp = MagicMock()
         mock_resp.status_code = 200
@@ -212,7 +212,7 @@ class TestNewsAPIFailures:
     """NewsAPI failures should raise specific exceptions."""
 
     def test_rate_limit_raises_newsapi_rate_limit_error(self):
-        from hymind.tools.news_api import search, NewsAPIRateLimitError
+        from tools.news_api import search, NewsAPIRateLimitError
 
         mock_resp = MagicMock()
         mock_resp.status_code = 429
@@ -225,7 +225,7 @@ class TestNewsAPIFailures:
                     search("hydrogen fuel cell")
 
     def test_server_error_raises_newsapi_server_error(self):
-        from hymind.tools.news_api import search, NewsAPIServerError
+        from tools.news_api import search, NewsAPIServerError
 
         mock_resp = MagicMock()
         mock_resp.status_code = 500
@@ -238,7 +238,7 @@ class TestNewsAPIFailures:
                     search("hydrogen fuel cell")
 
     def test_application_level_error_raises_newsapi_error(self):
-        from hymind.tools.news_api import search, NewsAPIError
+        from tools.news_api import search, NewsAPIError
 
         mock_resp = MagicMock()
         mock_resp.status_code = 200
@@ -255,7 +255,7 @@ class TestNewsAPIFailures:
                     search("hydrogen")
 
     def test_empty_query_returns_empty_without_api_call(self):
-        from hymind.tools.news_api import search
+        from tools.news_api import search
 
         with patch.dict(os.environ, {"NEWS_API_KEY": "test-key"}):
             with patch("requests.get") as mock_get:
@@ -264,7 +264,7 @@ class TestNewsAPIFailures:
         mock_get.assert_not_called()
 
     def test_removed_articles_filtered_out(self):
-        from hymind.tools.news_api import search
+        from tools.news_api import search
 
         mock_resp = MagicMock()
         mock_resp.status_code = 200
@@ -308,12 +308,12 @@ class TestWorkflowNodeIsolation:
     """Error in one collection node must not cascade to others."""
 
     def test_collect_serper_exception_returns_error_in_state(self):
-        from hymind.workflows.research_workflow import collect_serper
+        from workflows.research_workflow import collect_serper
 
         state = initial_state("hydrogen")
         with patch.dict(os.environ, {"SERPER_API_KEY": "test-key"}):
             with patch(
-                "hymind.tools.serper_search.search",
+                "tools.serper_search.search",
                 side_effect=RuntimeError("network failure"),
             ):
                 result = collect_serper(state)
@@ -322,12 +322,12 @@ class TestWorkflowNodeIsolation:
         assert any("collect_serper" in e for e in result.get("errors", []))
 
     def test_collect_news_exception_returns_error_in_state(self):
-        from hymind.workflows.research_workflow import collect_news
+        from workflows.research_workflow import collect_news
 
         state = initial_state("hydrogen")
         with patch.dict(os.environ, {"NEWS_API_KEY": "test-key"}):
             with patch(
-                "hymind.tools.news_api.search",
+                "tools.news_api.search",
                 side_effect=ConnectionError("DNS failure"),
             ):
                 result = collect_news(state)
@@ -336,12 +336,12 @@ class TestWorkflowNodeIsolation:
         assert any("collect_news" in e for e in result.get("errors", []))
 
     def test_collect_rss_exception_returns_error_in_state(self):
-        from hymind.workflows.research_workflow import collect_rss
+        from workflows.research_workflow import collect_rss
 
         state = initial_state("hydrogen")
         # read_feeds is imported directly into research_workflow, so patch there
         with patch(
-            "hymind.workflows.research_workflow.read_feeds",
+            "workflows.research_workflow.read_feeds",
             side_effect=RuntimeError("catastrophic RSS failure"),
         ):
             result = collect_rss(state)
@@ -350,7 +350,7 @@ class TestWorkflowNodeIsolation:
         assert any("collect_rss" in e for e in result.get("errors", []))
 
     def test_crawl_selected_exception_returns_error_in_state(self):
-        from hymind.workflows.research_workflow import crawl_selected
+        from workflows.research_workflow import crawl_selected
 
         state = {
             **initial_state("hydrogen"),
@@ -361,14 +361,14 @@ class TestWorkflowNodeIsolation:
             ],
         }
         # crawl_many is imported directly into research_workflow, so patch there
-        with patch("hymind.workflows.research_workflow.crawl_many", side_effect=RuntimeError("crash")):
+        with patch("workflows.research_workflow.crawl_many", side_effect=RuntimeError("crash")):
             result = crawl_selected(state)
 
         assert result["crawled_results"] == []
         assert any("crawl_selected" in e for e in result.get("errors", []))
 
     def test_crawl_selected_skips_pdf_urls(self):
-        from hymind.workflows.research_workflow import crawl_selected
+        from workflows.research_workflow import crawl_selected
 
         state = {
             **initial_state("hydrogen"),
@@ -392,7 +392,7 @@ class TestWorkflowNodeIsolation:
                     for u in urls]
 
         # crawl_many is imported directly into research_workflow, so patch there
-        with patch("hymind.workflows.research_workflow.crawl_many", side_effect=_track_urls):
+        with patch("workflows.research_workflow.crawl_many", side_effect=_track_urls):
             crawl_selected(state)
 
         # PDF must be excluded from crawl
@@ -400,7 +400,7 @@ class TestWorkflowNodeIsolation:
         assert "https://example.com/article" in crawled_urls
 
     def test_crawl_selected_no_crawlable_urls_returns_warning(self):
-        from hymind.workflows.research_workflow import crawl_selected
+        from workflows.research_workflow import crawl_selected
 
         state = {
             **initial_state("hydrogen"),
@@ -415,7 +415,7 @@ class TestWorkflowNodeIsolation:
         assert any("crawl_selected" in w for w in result.get("warnings", []))
 
     def test_store_findings_in_pinecone_skips_gracefully_without_config(self):
-        from hymind.workflows.research_workflow import store_findings_in_pinecone
+        from workflows.research_workflow import store_findings_in_pinecone
 
         state = {
             **initial_state("hydrogen"),
@@ -433,7 +433,7 @@ class TestWorkflowNodeIsolation:
         assert any("Pinecone" in w for w in result.get("warnings", []))
 
     def test_retrieve_context_from_pinecone_skips_gracefully_without_config(self):
-        from hymind.workflows.research_workflow import retrieve_context_from_pinecone
+        from workflows.research_workflow import retrieve_context_from_pinecone
 
         state = initial_state("hydrogen")
         with patch.dict(os.environ, {"PINECONE_API_KEY": ""}, clear=False):
@@ -450,7 +450,7 @@ class TestWorkflowNodeIsolation:
 
 class TestFinalizeState:
     def test_empty_state_does_not_raise(self):
-        from hymind.workflows.research_workflow import finalize_state
+        from workflows.research_workflow import finalize_state
 
         state = initial_state("hydrogen")
         result = finalize_state(state)
@@ -463,7 +463,7 @@ class TestFinalizeState:
         assert meta["merged_count"] == 0
 
     def test_missing_start_time_does_not_raise(self):
-        from hymind.workflows.research_workflow import finalize_state
+        from workflows.research_workflow import finalize_state
 
         state = {**initial_state("hydrogen"), "run_metadata": {}}
         result = finalize_state(state)
@@ -471,7 +471,7 @@ class TestFinalizeState:
         assert result["run_metadata"]["duration_seconds"] is None
 
     def test_invalid_start_time_format_does_not_raise(self):
-        from hymind.workflows.research_workflow import finalize_state
+        from workflows.research_workflow import finalize_state
 
         state = {
             **initial_state("hydrogen"),
@@ -483,7 +483,7 @@ class TestFinalizeState:
         assert result["run_metadata"]["duration_seconds"] is None
 
     def test_counts_match_actual_state_lists(self):
-        from hymind.workflows.research_workflow import finalize_state
+        from workflows.research_workflow import finalize_state
 
         state = {
             **initial_state("hydrogen"),
@@ -511,7 +511,7 @@ class TestFinalizeState:
         assert meta["warning_count"] == 2
 
     def test_duration_seconds_positive_when_start_time_set(self):
-        from hymind.workflows.research_workflow import finalize_state
+        from workflows.research_workflow import finalize_state
 
         state = {
             **initial_state("hydrogen"),
@@ -531,7 +531,7 @@ class TestReportGeneratorDegradedState:
     """Report generation must log warnings and still attempt generation when findings are sparse."""
 
     def test_empty_merged_results_logs_warning_but_proceeds(self, tmp_path):
-        from hymind.reporting.report_generator import generate_report
+        from reporting.report_generator import generate_report
 
         state = {
             **initial_state("hydrogen test"),
@@ -561,7 +561,7 @@ class TestReportGeneratorDegradedState:
         )
 
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}, clear=False):
-            with patch("hymind.reporting.report_generator.complete", return_value=mock_body):
+            with patch("reporting.report_generator.complete", return_value=mock_body):
                 report_path, char_count = generate_report(state, output_dir=tmp_path)
 
         assert report_path.exists()
@@ -570,7 +570,7 @@ class TestReportGeneratorDegradedState:
         assert "[System-generated]" not in content
 
     def test_no_successful_crawls_still_generates_report(self, tmp_path):
-        from hymind.reporting.report_generator import generate_report
+        from reporting.report_generator import generate_report
 
         state = {
             **initial_state("hydrogen funding"),
@@ -610,7 +610,7 @@ class TestReportGeneratorDegradedState:
         )
 
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}, clear=False):
-            with patch("hymind.reporting.report_generator.complete", return_value=mock_body):
+            with patch("reporting.report_generator.complete", return_value=mock_body):
                 report_path, char_count = generate_report(state, output_dir=tmp_path)
 
         assert report_path.exists()
@@ -625,7 +625,7 @@ class TestOpenAIFailures:
     """OpenAI API failures must propagate with appropriate exception types."""
 
     def test_api_timeout_error_reraises_after_retries(self):
-        from hymind.tools.openai_client import complete
+        from tools.openai_client import complete
         from openai import APITimeoutError
 
         mock_client = MagicMock()
@@ -634,12 +634,12 @@ class TestOpenAIFailures:
         )
 
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
-            with patch("hymind.tools.openai_client._get_client", return_value=mock_client):
+            with patch("tools.openai_client._get_client", return_value=mock_client):
                 with pytest.raises(APITimeoutError):
                     complete("test prompt", max_tokens=100)
 
     def test_rate_limit_error_reraises_after_retries(self):
-        from hymind.tools.openai_client import complete
+        from tools.openai_client import complete
         from openai import RateLimitError
 
         mock_client = MagicMock()
@@ -648,12 +648,12 @@ class TestOpenAIFailures:
         )
 
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
-            with patch("hymind.tools.openai_client._get_client", return_value=mock_client):
+            with patch("tools.openai_client._get_client", return_value=mock_client):
                 with pytest.raises(RateLimitError):
                     complete("test prompt", max_tokens=100)
 
     def test_complete_returns_string_on_success(self):
-        from hymind.tools.openai_client import complete
+        from tools.openai_client import complete
 
         mock_response = MagicMock()
         mock_response.choices[0].message.content = "Hydrogen is the future."
@@ -663,14 +663,14 @@ class TestOpenAIFailures:
         mock_client.chat.completions.create.return_value = mock_response
 
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
-            with patch("hymind.tools.openai_client._get_client", return_value=mock_client):
+            with patch("tools.openai_client._get_client", return_value=mock_client):
                 result = complete("Tell me about hydrogen.", max_tokens=100)
 
         assert result == "Hydrogen is the future."
         assert isinstance(result, str)
 
     def test_complete_with_empty_response_returns_empty_string(self):
-        from hymind.tools.openai_client import complete
+        from tools.openai_client import complete
 
         mock_response = MagicMock()
         mock_response.choices[0].message.content = None
@@ -680,7 +680,7 @@ class TestOpenAIFailures:
         mock_client.chat.completions.create.return_value = mock_response
 
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
-            with patch("hymind.tools.openai_client._get_client", return_value=mock_client):
+            with patch("tools.openai_client._get_client", return_value=mock_client):
                 result = complete("Prompt.", max_tokens=100)
 
         assert result == ""
@@ -696,7 +696,7 @@ class TestDegradedPipeline:
     def test_all_api_sources_missing_rss_still_collected(self):
         """With Serper and NewsAPI keys absent, RSS runs and workflow completes."""
         import feedparser
-        from hymind.workflows.research_workflow import (
+        from workflows.research_workflow import (
             collect_serper, collect_news, collect_rss, merge_and_deduplicate
         )
 
@@ -723,7 +723,7 @@ class TestDegradedPipeline:
         mock_parsed.feed.title = "Hydrogen Insight"
         mock_parsed.entries = [mock_entry]
 
-        with patch("hymind.tools.rss_reader._fetch_content", return_value=b"<rss/>"):
+        with patch("tools.rss_reader._fetch_content", return_value=b"<rss/>"):
             with patch("feedparser.parse", return_value=mock_parsed):
                 rss_result = collect_rss(state)
 
@@ -741,20 +741,20 @@ class TestDegradedPipeline:
 
     def test_workflow_errors_accumulate_across_nodes(self):
         """Multiple nodes failing should accumulate errors in state, not overwrite."""
-        from hymind.workflows.research_workflow import collect_serper, collect_news
+        from workflows.research_workflow import collect_serper, collect_news
 
         state = initial_state("hydrogen")
 
         with patch.dict(os.environ, {"SERPER_API_KEY": "key", "NEWS_API_KEY": "key"}):
             with patch(
-                "hymind.tools.serper_search.search",
+                "tools.serper_search.search",
                 side_effect=RuntimeError("serper down"),
             ):
                 serper_result = collect_serper(state)
 
             news_state = {**state, **serper_result}
             with patch(
-                "hymind.tools.news_api.search",
+                "tools.news_api.search",
                 side_effect=RuntimeError("newsapi down"),
             ):
                 news_result = collect_news(news_state)

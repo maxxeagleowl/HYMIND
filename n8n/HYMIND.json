@@ -1,0 +1,431 @@
+{
+  "name": "HYMIND",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "feb7295a-cc84-48e9-8f61-aaa01a76adc6",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"topic\": \"weekly hydrogen and fuel cell market intelligence\",\n  \"report_type\": \"weekly_executive\",\n  \"run_mode\": \"scheduled\",\n  \"output_format\": \"markdown\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "47d66baa-db44-41b7-b112-b1dc7a0ac714",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://take-jury-plot.ngrok-free.dev/run-hymind",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"topic\": \"weekly hydrogen and fuel cell market intelligence\",\n  \"report_type\": \"weekly_executive\",\n  \"run_mode\": \"scheduled\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "cdebfa65-5b7b-44b9-8a52-eaf540b87500",
+      "name": "HTTP Request",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iapaQerj1kNMHLE3",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d6f283d5-65f6-4c6b-9f07-7c85fa0b4461",
+              "leftValue": "={{$json.status}}",
+              "rightValue": "=success",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "c9f3b6ce-6f62-4974-a476-06d173f7203c",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "09f54402-8570-429f-b4f8-db756c432444",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.report_content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "1b1773c7-01f6-4f65-9aeb-b3de7cb27317",
+      "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"timestamp\": \"{{$now}}\",\n  \"status\": \"failed\",\n  \"error\": \"{{$json.message || 'Unknown error'}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        96
+      ],
+      "id": "3ab756b1-dc9a-45c0-bb48-9414e5cbb6ba",
+      "name": "Edit Fields - error"
+    },
+    {
+      "parameters": {
+        "sendTo": "gunter.kleber@globefuelcell.com",
+        "subject": "🚨 HYMIND Workflow Failed",
+        "emailType": "text",
+        "message": "=The scheduled HYMIND workflow failed.\n\nTimestamp:\n{{$now}}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        96
+      ],
+      "id": "440893bc-1b57-4e41-8402-5647aacd1e19",
+      "name": "Send a message - error",
+      "webhookId": "6b27a4e5-7f0e-4807-823b-6e9a467aabdb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "qyuH3A5r0lOwFaSD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "gunter.kleber@globefuelcell.com",
+        "subject": "HYMIND Weekly Executive Report",
+        "message": "=<h2>HYMIND Weekly Executive Report</h2>  <p>Generated at:</p>  <p>{{$json.generated_at}}</p>  <hr>  <pre>{{$json.report_content}}</pre>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        -96
+      ],
+      "id": "922c2445-cbfd-45f2-9ab7-a50afeeb4905",
+      "name": "Send HYMIND report",
+      "webhookId": "1160e7a0-37a1-4788-9b8a-306b362b6320",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "qyuH3A5r0lOwFaSD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"timestamp\": \"{{$now}}\",\n  \"status\": \"sent\",\n  \"report_title\": \"{{$json.report_title}}\",\n  \"delivery_channel\": \"gmail\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1248,
+        -96
+      ],
+      "id": "6b0643ae-2778-4d07-8c48-0c2381896ecb",
+      "name": "Edit Fields - sent logging"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1v0FyoB2giBt7dqoFFZHnz9TiMmq2Ur9XeEB3DNp-J9Q",
+          "mode": "list",
+          "cachedResultName": "daily shit",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v0FyoB2giBt7dqoFFZHnz9TiMmq2Ur9XeEB3DNp-J9Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1539333848,
+          "mode": "list",
+          "cachedResultName": "table stuff",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v0FyoB2giBt7dqoFFZHnz9TiMmq2Ur9XeEB3DNp-J9Q/edit#gid=1539333848"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $json.timestamp }}",
+            "public repos": "={{ $json.report_title }}",
+            "user": "={{ $json.status }}",
+            "followers": "={{ $json.delivery_channel }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user",
+              "displayName": "user",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "followers",
+              "displayName": "followers",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "public repos",
+              "displayName": "public repos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fetched at",
+              "displayName": "fetched at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1456,
+        -96
+      ],
+      "id": "f5543f2d-e9ee-4a7d-8756-cbcfbc57a3ad",
+      "name": "Append row in sheet - sent logging",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "htaEzqYNIpiM8P1W",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Global error handler tracks workflow error.\n\nError in HYMIND worklfow executes if summary not successful",
+        "height": 128,
+        "width": 208,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        96
+      ],
+      "id": "d97fd2d5-86ad-4d93-98af-8c42faeb659a",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields - error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Send HYMIND report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields - error": {
+      "main": [
+        [
+          {
+            "node": "Send a message - error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send HYMIND report": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields - sent logging",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields - sent logging": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet - sent logging",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "uLyvGetv5BzxyH4t",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "43d19d46-9371-41b6-8ab3-a4ce0fa762f9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7843992dc979b7cca2024d63930e8442c96c78144b1f7f46c07aefc5ba80a1a7"
+  },
+  "id": "xq8oCL5hosb3cOfI",
+  "tags": []
+}

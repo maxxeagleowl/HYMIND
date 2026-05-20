@@ -2,7 +2,17 @@
 
 ## Current State
 
-Phase 5 — FastAPI HTTP wrapper complete.
+Structural refactor — `src/hymind/` package nesting removed.
+
+- All modules moved from `src/hymind/*` directly to `src/*`
+- `src/hymind/` directory deleted
+- All imports updated: `from hymind.X import Y` → `from X import Y`
+- Patch strings in tests updated to new module paths
+- `scripts/run_api.py` and `start_hymind_api.py` updated to `src.api.server:app`
+- `pyproject.toml` updated: `exclude = ["hymind*"]` in packages.find
+- 243 tests pass — no regressions
+
+## Previous State (Phase 5 — FastAPI HTTP wrapper complete)
 
 - `src/hymind/api/server.py` created: FastAPI server with `POST /run-hymind` and `GET /health`
 - `src/hymind/api/__init__.py` created

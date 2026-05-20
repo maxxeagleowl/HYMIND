@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from hymind.workflows.state import initial_state
+from workflows.state import initial_state
 
 
 # ---------------------------------------------------------------------------
@@ -15,14 +15,14 @@ from hymind.workflows.state import initial_state
 class TestSerperMissingKey:
     def test_search_exits_when_key_absent(self):
         with patch.dict(os.environ, {"SERPER_API_KEY": ""}, clear=False):
-            from hymind.tools.serper_search import search
+            from tools.serper_search import search
             with pytest.raises(SystemExit) as exc:
                 search("hydrogen")
         assert exc.value.code == 1
 
     def test_search_exits_with_whitespace_only_key(self):
         with patch.dict(os.environ, {"SERPER_API_KEY": "   "}, clear=False):
-            from hymind.tools.serper_search import search
+            from tools.serper_search import search
             with pytest.raises(SystemExit) as exc:
                 search("hydrogen")
         assert exc.value.code == 1
@@ -31,7 +31,7 @@ class TestSerperMissingKey:
 class TestNewsAPIMissingKey:
     def test_search_exits_when_key_absent(self):
         with patch.dict(os.environ, {"NEWS_API_KEY": ""}, clear=False):
-            from hymind.tools.news_api import search
+            from tools.news_api import search
             with pytest.raises(SystemExit) as exc:
                 search("hydrogen")
         assert exc.value.code == 1
@@ -45,7 +45,7 @@ class TestWorkflowNodesMissingKeys:
     """Workflow nodes must degrade gracefully — no sys.exit, workflow continues."""
 
     def test_collect_serper_returns_empty_results_and_warning(self):
-        from hymind.workflows.research_workflow import collect_serper
+        from workflows.research_workflow import collect_serper
         state = initial_state("hydrogen")
         with patch.dict(os.environ, {"SERPER_API_KEY": ""}, clear=False):
             result = collect_serper(state)
@@ -53,7 +53,7 @@ class TestWorkflowNodesMissingKeys:
         assert any("SERPER_API_KEY" in w for w in result.get("warnings", []))
 
     def test_collect_serper_does_not_raise_or_exit(self):
-        from hymind.workflows.research_workflow import collect_serper
+        from workflows.research_workflow import collect_serper
         state = initial_state("hydrogen")
         with patch.dict(os.environ, {"SERPER_API_KEY": ""}, clear=False):
             # Must not raise SystemExit or any other exception
@@ -61,7 +61,7 @@ class TestWorkflowNodesMissingKeys:
         assert isinstance(result, dict)
 
     def test_collect_news_returns_empty_results_and_warning(self):
-        from hymind.workflows.research_workflow import collect_news
+        from workflows.research_workflow import collect_news
         state = initial_state("hydrogen")
         with patch.dict(os.environ, {"NEWS_API_KEY": ""}, clear=False):
             result = collect_news(state)
@@ -69,7 +69,7 @@ class TestWorkflowNodesMissingKeys:
         assert any("NEWS_API_KEY" in w for w in result.get("warnings", []))
 
     def test_collect_news_does_not_raise_or_exit(self):
-        from hymind.workflows.research_workflow import collect_news
+        from workflows.research_workflow import collect_news
         state = initial_state("hydrogen")
         with patch.dict(os.environ, {"NEWS_API_KEY": ""}, clear=False):
             result = collect_news(state)
@@ -77,7 +77,7 @@ class TestWorkflowNodesMissingKeys:
 
     def test_both_nodes_missing_keys_workflow_still_has_rss(self):
         """Even with Serper and News keys missing, RSS collection is unaffected."""
-        from hymind.workflows.research_workflow import collect_serper, collect_news
+        from workflows.research_workflow import collect_serper, collect_news
         state = initial_state("hydrogen")
         with patch.dict(os.environ, {"SERPER_API_KEY": "", "NEWS_API_KEY": ""}, clear=False):
             serper_result = collect_serper(state)
@@ -98,14 +98,14 @@ class TestWorkflowNodesMissingKeys:
 
 class TestReportGeneratorMissingKey:
     def test_raises_runtime_error_not_system_exit(self, tmp_path):
-        from hymind.reporting.report_generator import generate_report
+        from reporting.report_generator import generate_report
         state = initial_state("hydrogen")
         with patch.dict(os.environ, {"OPENAI_API_KEY": ""}, clear=False):
             with pytest.raises(RuntimeError, match="OPENAI_API_KEY"):
                 generate_report(state, output_dir=tmp_path)
 
     def test_error_message_is_actionable(self, tmp_path):
-        from hymind.reporting.report_generator import generate_report
+        from reporting.report_generator import generate_report
         state = initial_state("hydrogen")
         with patch.dict(os.environ, {"OPENAI_API_KEY": ""}, clear=False):
             with pytest.raises(RuntimeError) as exc_info:

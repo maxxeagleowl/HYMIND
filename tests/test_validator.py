@@ -7,12 +7,12 @@ missing titles, and complete/partial/empty state dicts.
 
 import pytest
 
-from hymind.reporting.validator import (
+from reporting.validator import (
     ValidationResult,
     check_state_quality,
     validate_findings,
 )
-from hymind.workflows.state import initial_state
+from workflows.state import initial_state
 
 
 # ---------------------------------------------------------------------------

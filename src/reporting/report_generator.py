@@ -9,10 +9,10 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from hymind.tools.openai_client import complete
-from hymind.reporting.validator import check_state_quality, validate_findings
-from hymind.utils.logger import get_logger
-from hymind.workflows.state import AgentState
+from tools.openai_client import complete
+from reporting.validator import check_state_quality, validate_findings
+from utils.logger import get_logger
+from workflows.state import AgentState
 
 logger = get_logger(__name__)
 

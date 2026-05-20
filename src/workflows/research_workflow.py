@@ -16,12 +16,12 @@ from datetime import datetime, timezone
 
 from langgraph.graph import END, START, StateGraph
 
-from hymind.tools.rss_reader import DEFAULT_HYDROGEN_FEEDS, read_feeds
-from hymind.tools.serper_search import search as serper_search
-from hymind.tools.news_api import search as news_search
-from hymind.tools.web_crawler import crawl_many
-from hymind.utils.logger import get_logger
-from hymind.workflows.state import AgentState
+from tools.rss_reader import DEFAULT_HYDROGEN_FEEDS, read_feeds
+from tools.serper_search import search as serper_search
+from tools.news_api import search as news_search
+from tools.web_crawler import crawl_many
+from utils.logger import get_logger
+from workflows.state import AgentState
 
 logger = get_logger(__name__)
 
@@ -212,7 +212,7 @@ def store_findings_in_pinecone(state: AgentState) -> dict:
     """
     logger.info("=== Node START: store_findings_in_pinecone | topic=%r ===", state["topic"])
 
-    from hymind.rag.pinecone_store import is_pinecone_configured
+    from rag.pinecone_store import is_pinecone_configured
 
     if not is_pinecone_configured():
         logger.warning("store_findings_in_pinecone: Pinecone not configured — RAG storage skipped")
@@ -225,7 +225,7 @@ def store_findings_in_pinecone(state: AgentState) -> dict:
         return {"warnings": ["store_findings_in_pinecone: OPENAI_API_KEY missing — RAG storage skipped"]}
 
     try:
-        from hymind.rag.retriever import store_from_state
+        from rag.retriever import store_from_state
         count = store_from_state(state, topic=state["topic"])
         logger.info("=== Node END: store_findings_in_pinecone | stored=%d vectors ===", count)
         return {}
@@ -250,7 +250,7 @@ def retrieve_context_from_pinecone(state: AgentState) -> dict:
     logger.info("=== Node START: retrieve_context_from_pinecone | topic=%r ===", state["topic"])
 
     try:
-        from hymind.rag.retriever import retrieve_context
+        from rag.retriever import retrieve_context
         results = retrieve_context(topic=state["topic"], query=state["topic"], top_k=5)
         rag_dicts = [dataclasses.asdict(r) for r in results]
         logger.info(
@@ -369,6 +369,6 @@ def run_research(topic: str) -> AgentState:
     Returns:
         Final AgentState dict with all collected, merged, and crawled results.
     """
-    from hymind.workflows.state import initial_state
+    from workflows.state import initial_state
     app = build_workflow()
     return app.invoke(initial_state(topic))

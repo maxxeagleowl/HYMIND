@@ -3,9 +3,9 @@
 import feedparser
 import pytest
 
-from hymind.tools.serper_search import _normalize as serper_normalize
-from hymind.tools.news_api import _normalize as news_normalize
-from hymind.tools.rss_reader import _normalize_entry as rss_normalize
+from tools.serper_search import _normalize as serper_normalize
+from tools.news_api import _normalize as news_normalize
+from tools.rss_reader import _normalize_entry as rss_normalize
 
 EXPECTED_KEYS = frozenset({
     "title", "url", "snippet", "published_at",

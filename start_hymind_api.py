@@ -18,7 +18,7 @@ API_KEY = os.getenv("HYMIND_API_KEY", "")
 subprocess.Popen(
     [
         "uvicorn",
-        "src.hymind.api.server:app",
+        "src.api.server:app",
         "--host", "0.0.0.0",
         "--port", "8000",
     ]

@@ -5,13 +5,13 @@ from unittest.mock import patch
 
 import pytest
 
-from hymind.reporting.report_generator import (
+from reporting.report_generator import (
     DEFAULT_OUTPUT_DIR,
     _MAX_CONTEXT_CHARS,
     build_context,
     generate_report,
 )
-from hymind.workflows.state import initial_state
+from workflows.state import initial_state
 
 # ---------------------------------------------------------------------------
 # build_context — context assembly and limits
@@ -104,7 +104,7 @@ class TestBuildContext:
         assert len(ctx) <= _MAX_CONTEXT_CHARS + 200
 
     def test_crawled_content_capped_per_item(self):
-        from hymind.reporting.report_generator import _MAX_CRAWLED_CONTENT_CHARS
+        from reporting.report_generator import _MAX_CRAWLED_CONTENT_CHARS
         long_content = "x" * (_MAX_CRAWLED_CONTENT_CHARS + 5000)
         state = {
             **initial_state("hydrogen"),
@@ -186,7 +186,7 @@ class TestGenerateReport:
         )
 
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key-not-real"}, clear=False):
-            with patch("hymind.reporting.report_generator.complete", return_value=_mock_body):
+            with patch("reporting.report_generator.complete", return_value=_mock_body):
                 report_path, char_count = generate_report(state, output_dir=tmp_path)
 
         assert report_path.exists()
@@ -232,7 +232,7 @@ class TestGenerateReport:
         )
 
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}, clear=False):
-            with patch("hymind.reporting.report_generator.complete", return_value=mock_body):
+            with patch("reporting.report_generator.complete", return_value=mock_body):
                 report_path, _ = generate_report(state, output_dir=tmp_path)
 
         content = report_path.read_text(encoding="utf-8")
@@ -255,7 +255,7 @@ class TestGenerateReport:
             "## Workflow Metadata\n[System-generated]"
         )
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}, clear=False):
-            with patch("hymind.reporting.report_generator.complete", return_value=mock_body):
+            with patch("reporting.report_generator.complete", return_value=mock_body):
                 report_path, _ = generate_report(state, output_dir=tmp_path)
 
         content = report_path.read_text(encoding="utf-8")

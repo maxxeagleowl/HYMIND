@@ -1,0 +1,118 @@
+{
+  "name": "Global Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a1e39989-1827-40f8-a207-1d55e22a1261",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4cacacda-28fa-435d-a771-5a8ab2dafa97",
+              "name": "error message",
+              "value": "={{ $json.execution.error.message }}",
+              "type": "string"
+            },
+            {
+              "id": "27b5945b-4352-4bb0-b7d8-a19b3ad30171",
+              "name": "workflow name",
+              "value": "={{ $json.workflow.name }}",
+              "type": "string"
+            },
+            {
+              "id": "32d5a9a2-02bf-42c6-9b23-3660de416543",
+              "name": "failed node",
+              "value": "={{ $json.execution.lastNodeExecuted }}",
+              "type": "string"
+            },
+            {
+              "id": "bee07284-5dee-48b9-bd86-cef9a4e6ae58",
+              "name": "Time",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "75f7c0d7-1fd9-4d18-9288-f75f67810c51",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "sendTo": "gunter.kleber@globefuelcell.com",
+        "subject": "=🚨 Workflow Failed: {{ $json['workflow name'] }}",
+        "message": "=Workflow: {{ $json['workflow name'] }}\nNode: {{ $json['failed node'] }}\nError:{{ $json['error message'] }}\nTime: {{ $json.Time }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        0
+      ],
+      "id": "80215ab1-d5e7-4c6b-b4b5-e7136613baf6",
+      "name": "Send a message",
+      "webhookId": "f8cfa5f7-2217-454b-a0f8-65e42f0e4cfe",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "qyuH3A5r0lOwFaSD",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "60120e8b-0129-4175-9a6e-1a2653517717",
+  "meta": {
+    "instanceId": "7843992dc979b7cca2024d63930e8442c96c78144b1f7f46c07aefc5ba80a1a7"
+  },
+  "id": "uLyvGetv5BzxyH4t",
+  "tags": []
+}

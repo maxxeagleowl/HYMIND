@@ -25,8 +25,8 @@ import os
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-from hymind.rag.schemas import StoredFinding
-from hymind.utils.logger import get_logger
+from rag.schemas import StoredFinding
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
 

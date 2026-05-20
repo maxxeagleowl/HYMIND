@@ -1,5 +1,7 @@
 # Decision Log
 
+- 2026-05-20: Refactoring — Removed nested `src/hymind/` package layer. All application modules now live directly under `src/` (api/, rag/, reporting/, tools/, utils/, workflows/, main.py). Motivation: simplify import paths, remove unnecessary indirection. Approach: copy-then-delete (safe); bulk sed replacement for all `from hymind.X` → `from X` imports; patch strings in tests updated to match new module paths. Logger hierarchy names (`"hymind.api"`, `"hymind.main"`) and log file name (`hymind.log`) intentionally left unchanged as they reference the application name, not the Python package path. 243 tests pass after refactor.
+
 - 2026-05-19: Phase 5 — Added FastAPI HTTP wrapper (`src/hymind/api/server.py`) so n8n can trigger the HYMIND agent via HTTP and receive the full Markdown report content in the JSON response. Used a plain `def` endpoint (not `async def`) so FastAPI automatically runs the blocking LangGraph pipeline in a thread-pool executor without stalling the event loop. Failures return HTTP 200 with `status: failed` so n8n can read the error message without triggering its own HTTP error handling. Optional `x-api-key` auth controlled by `HYMIND_API_KEY` env var — empty value disables auth for local development. The API layer wraps existing `run_research()` and `generate_report()` without duplicating agent logic.
 - 2026-05-19: Phase 5 — Added `GET /health` liveness endpoint returning immediately so n8n (or ngrok) can confirm the server is up before a scheduled run fires.
 
