@@ -2,83 +2,61 @@
 
 ## Status
 
-**Phase 5 — API Wrapper Complete**
+**Phase 6 — Documentation and Submission Finalization — In Progress**
 
-The FastAPI HTTP wrapper is implemented and documented. n8n can now call `POST /run-hymind` via ngrok and receive the full Markdown report content in the response.
-
-## Phase 5 API Deliverables
+## Phase 6 Deliverables
 
 | Component | File(s) | Status |
 |---|---|---|
-| FastAPI server | `src/hymind/api/server.py` | Done |
-| Start script | `scripts/run_api.py` | Done |
-| Dependencies | `requirements.txt` (+fastapi, uvicorn) | Done |
-| Auth env var | `.env.example` (HYMIND_API_KEY) | Done |
-| README section | `README.md` (Phase 5 API/ngrok/n8n) | Done |
+| README finalization | `README.md` | Done |
+| Architecture docs | `docs/architecture/system_architecture.md` | Done |
 | Workflow docs | `docs/operations/workflow_documentation.md` | Done |
+| n8n workflow docs | `docs/operations/n8n_workflow.md` | Done (new) |
+| Demo runbook | `docs/operations/demo_runbook.md` | Done (new) |
+| Limitations update | `docs/operations/limitations.md` | Done |
+| Task board update | `docs/operations/task_board.md` | Done |
+| Project state | `docs/project_state.md` | Done |
+| Stories/DOD | `docs/planning/stories.md` | Done |
+| MVP summary | `MVP_summary.md` | Done |
+| Stale file cleanup | 4 files deleted | Done |
+| Path fixes | phase_2_research_foundation.md, news_api.py | Done |
+| Decision log | `docs/decision_log.md` | Done |
+| Progress log | `docs/operations/progress_log.md` | Done |
 
-## Remaining Phase 5 Work
+## Remaining Phase 6 Items
 
-- HYM-028: n8n scheduled report delivery trigger (workflow JSON, screenshots)
-- HYM-029: Markdown-to-PDF conversion
-- HYM-030: Gmail delivery integration
-- HYM-031: Optional Telegram alert integration
-- HYM-032: Delivery logging and retry handling
-- HYM-033: n8n workflow JSON export and screenshots
-
-## Phase 4 Summary (completed)
-
-## Phase 4 Deliverables
-
-| Component | File(s) | Status |
-|---|---|---|
-| Output validation layer | `src/hymind/reporting/validator.py` | Done |
-| Validator integration in report generator | `src/hymind/reporting/report_generator.py` | Done |
-| Node-level START/END logging | `src/hymind/workflows/research_workflow.py` | Done |
-| Failure scenario tests | `tests/test_reliability.py` (73 tests) | Done |
-| Validator unit tests | `tests/test_validator.py` (34 tests) | Done |
-| Sample reports (3 topics) | `outputs/sample_reports/` | Done |
-| Phase 4 documentation | `docs/`, `memory/active/` | Done |
-
-## Total Test Suite
-
-**243 tests — all pass**
-
-- Phase 1–3 tests retained: 170 (unchanged, all still pass)
-- Phase 4 new tests: 73 (test_reliability.py)
-- Phase 4 validator tests: 34 (test_validator.py) — wait, 170+73+34=277 but pytest says 243. Let me trust the pytest count: **243 total, all pass**.
+- **HYM-043**: Final deliverable validation (this session)
+- **HYM-044**: Demo runbook created (done this session)
+- **HYM-045**: Final submission review — verify secrets, .gitignore, broken imports
+- Git commit of all Phase 6 changes
 
 ## How to Run
 
 ```powershell
 # Full pipeline
-C:\Users\nest\.conda\envs\hymind\python.exe -m hymind.main
+python -m main
+
+# Custom topic
+python -m main "hydrogen funding Germany 2026"
 
 # Run tests
-C:\Users\nest\.conda\envs\hymind\python.exe -m pytest tests/ -v
+pytest tests/ -v
 
-# Phase 4 specific tests
-C:\Users\nest\.conda\envs\hymind\python.exe -m pytest tests/test_reliability.py tests/test_validator.py -v
+# Start API server
+uvicorn src.api.server:app --host 0.0.0.0 --port 8000 --reload
+
+# Start API + ngrok
+python start_hymind_api.py
 ```
 
-## Next Phase
+## Phase Summary
 
-**Phase 5: Distribution Automation & PDF Reporting**
-
-- n8n weekly schedule automation
-- Execute Command integration (trigger Python agent from n8n)
-- Markdown-to-PDF conversion
-- Gmail delivery workflow
-- Optional Telegram alert integration
-- Delivery logging and retry handling
-- Archive automation
-- n8n workflow JSON export and screenshots
-
-**Phase 6: Documentation, Demo & Project Finalization**
-
-- Finalize README.md and architecture documentation
-- Finalize AGENTS.md and skills/ documentation
-- Generate final sample reports
-- Validate all deliverables against project requirements
-- Prepare demo workflow and presentation material
-- Final submission review and repository cleanup
+| Phase | Status |
+|---|---|
+| Phase 0 | Complete |
+| Phase 1 | Complete |
+| Phase 2 | Complete |
+| Phase 3 | Complete |
+| Phase 4 | Complete |
+| Phase 5 | Complete |
+| Phase 6 | In Progress |

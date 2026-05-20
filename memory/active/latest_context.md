@@ -2,50 +2,57 @@
 
 ## Current State
 
-Structural refactor — `src/hymind/` package nesting removed.
+**Phase 6 — Documentation and Submission Finalization — In Progress**
 
-- All modules moved from `src/hymind/*` directly to `src/*`
-- `src/hymind/` directory deleted
-- All imports updated: `from hymind.X import Y` → `from X import Y`
-- Patch strings in tests updated to new module paths
-- `scripts/run_api.py` and `start_hymind_api.py` updated to `src.api.server:app`
-- `pyproject.toml` updated: `exclude = ["hymind*"]` in packages.find
-- 243 tests pass — no regressions
+Phase 6 documentation pass completed. All major documentation gaps closed.
 
-## Previous State (Phase 5 — FastAPI HTTP wrapper complete)
+## Phase 6 Changes (2026-05-20)
 
-- `src/hymind/api/server.py` created: FastAPI server with `POST /run-hymind` and `GET /health`
-- `src/hymind/api/__init__.py` created
-- `scripts/run_api.py` created: convenience uvicorn start script
-- `requirements.txt` updated: added `fastapi`, `uvicorn[standard]`
-- `.env.example` updated: added `HYMIND_API_KEY` (optional auth)
-- `README.md` updated: added Phase 5 API/ngrok/n8n integration section
-- `docs/operations/workflow_documentation.md` created: full endpoint, ngrok, n8n, and troubleshooting docs
+### Files Deleted
+- `HYMIND_agent_plan.md` — superseded by docs/planning/stories.md
+- `docs/architecture/top_level_architecture.md` — superseded by system_architecture.md
+- `memory/latest_context.md` (root) — empty duplicate
+- `memory/session_summary.md` (root) — empty duplicate
 
-The API wraps `run_research()` + `generate_report()` via `run_hymind_agent()`. No core agent logic was changed.
+### Files Updated
+| File | Change |
+|---|---|
+| `README.md` | Full rewrite: Phase 1–5 complete status, correct 243 test count, correct `src/` layout, correct run commands (`python -m main`), correct API server command (`uvicorn src.api.server:app`), Phase 4 reliability section, Phase 5 n8n/Gmail/Sheets section, full repo layout, known limitations |
+| `docs/architecture/system_architecture.md` | Removed `src/hymind/` references; removed Alpha Vantage (not implemented); updated Phase 5 distribution section (HTML not PDF) |
+| `docs/operations/workflow_documentation.md` | Fixed `src/hymind/api/` → `src/api/`; documented Google Sheets logging; noted PDF descoping |
+| `docs/operations/limitations.md` | Section 6 updated: Phase 5 complete; PDF and Telegram descoping documented |
+| `docs/operations/task_board.md` | Phase 5 tasks marked Done/Descoped; Phase 6 tasks updated |
+| `docs/project_state.md` | Phase 5 Complete, Phase 6 In Progress |
+| `docs/planning/stories.md` | Phase 5/6 DOD updated to match actual delivery |
+| `docs/architecture/phase_2_research_foundation.md` | Fixed `src/hymind/tools/` → `src/tools/` |
+| `src/tools/news_api.py` | Fixed stale `src/hymind/tools/` path in comment |
+| `MVP_summary.md` | Complete rewrite — all phases documented with final state |
+| `docs/decision_log.md` | Phase 5 completion entry + Phase 6 cleanup rationale |
+| `docs/operations/progress_log.md` | Phase 6 session entry added |
 
-## Previous State (Phase 4 complete)
+### Files Created
+| File | Purpose |
+|---|---|
+| `docs/operations/n8n_workflow.md` | Full n8n workflow documentation with setup instructions |
+| `docs/operations/demo_runbook.md` | 5–7 minute demo guide |
 
-- `src/hymind/reporting/validator.py` created: `validate_findings()` and `check_state_quality()` functions
-- `tests/test_reliability.py` created: 73 failure scenario tests covering RSS failures, Serper failures, NewsAPI failures, workflow node isolation, finalize_state edge cases, OpenAI failure propagation, degraded pipeline scenarios
-- `tests/test_validator.py` created: 34 validator unit tests
-- `src/hymind/reporting/report_generator.py` updated: validator integrated before context build; start/end logging markers
-- `src/hymind/workflows/research_workflow.py` updated: `=== Node START/END ===` markers on all 9 nodes
-- `outputs/sample_reports/` created: 3 realistic sample reports (European electrolyzer market, FCEV competition, US hydrogen policy)
-- Full test suite: **243 tests, all pass**
+## Previous State (Phase 5 — n8n complete)
 
-## Documentation Updated
+- `n8n/HYMIND.json` — full workflow: Schedule → HTTP → Markdown→HTML → Gmail → Google Sheets logging
+- `n8n/Global Error Handler.json` — companion error handler
+- PDF descoped; Telegram descoped
+- FastAPI wrapper: `src/api/server.py`
 
-- `docs/project_state.md` — Phase 4 marked complete
-- `docs/decision_log.md` — 4 Phase 4 decision entries added
-- `docs/operations/task_board.md` — HYM-034 through HYM-039 added and marked done
-- `memory/active/latest_context.md` — this file
-- `memory/active/current_focus.md` — updated
-- `memory/active/active_risks.md` — RISK-004 updated to reflect 243 tests
+## Previous State (Structural Refactor)
+
+- `src/hymind/` nesting removed — all modules directly under `src/`
+- 243 tests pass
 
 ## Operational Focus
 
-- Phase 4 is complete.
-- Phase 5 is Distribution Automation & PDF Reporting: n8n scheduling, Execute Command integration, Markdown-to-PDF conversion, Gmail delivery, optional Telegram alerts, delivery logging, archive automation, n8n workflow JSON export and screenshots.
-- Phase 6 is Documentation, Demo & Project Finalization: README finalization, architecture documentation, workflow diagrams, AGENTS.md finalization, deliverable validation, demo preparation, presentation material, submission-ready repository.
-- Core intelligence stays in Python/LangGraph; n8n is reserved for Phase 5 external delivery automation.
+Phase 6 is in progress. Remaining items:
+- Final submission review
+- Verify no secrets in committed files
+- Confirm `.gitignore` is correct
+- Consider adding `pyproject.toml` cleanup (remove `fpdf2` since PDF was descoped)
+- Git commit of all Phase 6 changes

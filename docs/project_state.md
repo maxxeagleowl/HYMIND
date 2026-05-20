@@ -36,6 +36,8 @@ docs/
 | Phase 2 | Complete | Collector abstraction, validation layer, Phase 2 NewsAPI test suite, API integration docs |
 | Phase 3 | Complete | Pinecone RAG storage and retrieval, 46 new tests, backward-compatible workflow nodes |
 | Phase 4 | Complete | End-to-end reliability hardening, output validation layer, 73 new tests (243 total), sample reports, logging improvements |
+| Phase 5 | Complete | FastAPI HTTP wrapper, n8n scheduled workflow, Gmail delivery, Google Sheets delivery logging, ngrok integration. PDF and Telegram descoped from MVP. |
+| Phase 6 | In Progress | README finalization, architecture documentation, deliverable validation, demo runbook, submission review |
 
 ## Operational Notes
 
@@ -47,7 +49,8 @@ docs/
 - Phase 3 adds: `src/rag/` (schemas, embeddings, pinecone_store, retriever), `tests/test_rag.py`, two new LangGraph nodes (`store_findings_in_pinecone`, `retrieve_context_from_pinecone`), `rag_context` field in AgentState, RAG context injection in report_generator.py.
 - Phase 4 adds: `src/reporting/validator.py` (validate_findings, check_state_quality), `tests/test_reliability.py` (73 failure scenario tests), `tests/test_validator.py` (34 validator unit tests), 3 sample reports in `outputs/sample_reports/`, validator integration in report_generator.py, node-level START/END logging markers across all 9 workflow nodes.
 - Structural refactor (2026-05-20): removed `src/hymind/` nesting — all modules now live directly under `src/`. Import paths flattened: `from X import Y` (was `from hymind.X import Y`). 243 tests pass.
-- Roadmap update: Phase 5 owns n8n, PDF generation, Gmail, Telegram, delivery logging, and report archiving. Phase 6 owns Documentation, Demo, and Project Finalization.
+- Phase 5 adds: `src/api/server.py` (FastAPI wrapper), `scripts/run_api.py`, `start_hymind_api.py`, `n8n/HYMIND.json` (Schedule → HTTP → Markdown→HTML → Gmail → Sheets), `n8n/Global Error Handler.json`. PDF generation descoped; Telegram descoped. Delivery logging implemented via Google Sheets.
+- Phase 6: Documentation finalization, deliverable validation, demo runbook, submission review.
 
 ## Skills Structure
 

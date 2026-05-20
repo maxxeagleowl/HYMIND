@@ -7,276 +7,198 @@
 
 # Overview
 
-HYMIND is an autonomous AI powered research and reporting system focused on the hydrogen and fuel cell industry.
+HYMIND is an autonomous AI-powered research and reporting system focused on the hydrogen and fuel cell industry.
 
-The MVP demonstrates a complete end to end research workflow that collects information from multiple external sources, normalizes and validates the data, processes it through a LangGraph pipeline, and generates structured executive intelligence reports.
+The MVP demonstrates a complete end-to-end autonomous workflow that:
+
+1. Collects intelligence from multiple external sources (Serper, NewsAPI, RSS feeds, web crawling)
+2. Normalizes, validates, and deduplicates all collected data
+3. Stores and retrieves historical findings via Pinecone vector database (RAG)
+4. Synthesizes executive reports using OpenAI GPT-4o-mini
+5. Delivers reports automatically via a FastAPI HTTP wrapper and n8n workflow with Gmail delivery
 
 The project was designed to satisfy the autonomous agent requirements of Project 3, including:
 
-- Multi source research
-- Autonomous workflow execution
-- Agent orchestration
+- Multi-source research
+- Autonomous workflow execution (LangGraph)
 - Structured report generation
-- Error handling and validation
-- LangGraph integration
+- Error handling, validation, and reliability hardening
 - Real API tool usage
-- Reliability focused testing
+- Distribution automation (n8n, Gmail)
 
 ---
 
-# MVP Scope
+# What Was Built — Phase Summary
 
-The implemented MVP focuses on:
+## Phase 1 — Core Pipeline
 
-- Hydrogen industry intelligence gathering
-- Structured research collection
-- Multi source aggregation
-- Executive report preparation
-- LangGraph based orchestration
-- Deterministic data normalization
-- Reliability and validation testing
+| Component | File | Description |
+|---|---|---|
+| OpenAI client | `src/tools/openai_client.py` | Synthesis with tenacity retry |
+| Serper search | `src/tools/serper_search.py` | Google-based web research |
+| NewsAPI | `src/tools/news_api.py` | Structured news retrieval |
+| RSS ingestion | `src/tools/rss_reader.py` | Hydrogen industry feeds |
+| Web crawler | `src/tools/web_crawler.py` | Article content extraction |
+| LangGraph workflow | `src/workflows/research_workflow.py` | 9-node state machine |
+| Report generator | `src/reporting/report_generator.py` | Markdown executive reports |
+| Logger | `src/utils/logger.py` | Rich console + file logging |
+| Entry point | `src/main.py` | CLI runner |
 
-Excluded from the MVP:
+## Phase 2 — Collector Abstraction
 
-- Full production deployment
-- Real time dashboarding
-- Phase 5 distribution automation
-- Advanced long term RAG memory
-- Multi tenant support
-- Deep analytics and forecasting
+- `CollectorProtocol` (structural typing.Protocol) in `src/tools/collector.py`
+- Input validation layer: `validate_result()`, `validate_results()`
+- HTML stripping in NewsAPI normalization
+- 60-test NewsAPI test suite
 
----
+## Phase 3 — Pinecone RAG
 
-# What Was Built
+- `src/rag/` — embeddings, pinecone_store, retriever, schemas
+- Two new LangGraph nodes: `store_findings_in_pinecone`, `retrieve_context_from_pinecone`
+- Historical context injected into report synthesis as `=== HISTORICAL CONTEXT ===`
+- Graceful degradation — pipeline continues if Pinecone is not configured
+- 46 new RAG tests
 
-## 1. Research Collection Layer
+## Phase 4 — Reliability Hardening
 
-The system integrates multiple external research sources:
+- `src/reporting/validator.py` — `validate_findings()`, `check_state_quality()`
+- `=== Node START/END ===` logging markers on all 9 workflow nodes
+- 73 failure-scenario tests (timeouts, malformed feeds, degraded pipeline, node isolation)
+- 34 validator unit tests
+- 243 total tests — all pass
+- 3 sample reports in `outputs/sample_reports/`
 
-| Source | Purpose |
-|---|---|
-| Serper API | Google based web research |
-| NewsAPI | Structured industry news |
-| RSS Feeds | Industry feed aggregation |
-| Website Crawling | Direct content extraction |
+## Phase 5 — Distribution Automation
 
-The collector layer retrieves:
-
-- Hydrogen market news
-- Competitor announcements
-- Policy updates
-- Funding information
-- Technical developments
-- Engineering related signals
-
----
-
-# Data Normalization
-
-All incoming research data is transformed into one unified schema.
-
-## Unified Schema
-
-```python
-{
-    "title": str,
-    "url": str,
-    "source": str,
-    "published_at": str,
-    "snippet": str,
-    "content": str,
-    "source_type": str,
-    "topic": str,
-    "confidence": float
-}
-```
-
-This guarantees that all downstream processing nodes operate on stable and validated data structures.
+- `src/api/server.py` — FastAPI with `POST /run-hymind` and `GET /health`
+- `scripts/run_api.py` — uvicorn convenience script
+- `start_hymind_api.py` — starts FastAPI + ngrok + prints n8n config
+- `n8n/HYMIND.json` — full n8n workflow (Schedule → HTTP → Markdown→HTML → Gmail → Sheets)
+- `n8n/Global Error Handler.json` — n8n error handler
+- Delivery logging via Google Sheets
+- PDF descoped: Markdown→HTML conversion handles email delivery
 
 ---
 
 # LangGraph Workflow
 
-The MVP implements a modular LangGraph orchestration pipeline.
-
-## Current Pipeline
+The 9-node pipeline executes in sequence:
 
 ```text
-START
+initialize_state
   ↓
-collect_research
+collect_serper        ← Serper API (organic + news results)
   ↓
-normalize_content
+collect_news          ← NewsAPI (structured news)
   ↓
-deduplicate_results
+collect_rss           ← RSS/Atom feeds (hydrogen industry)
   ↓
-validate_results
+merge_and_deduplicate ← normalised URL deduplication
   ↓
-generate_summary
+crawl_selected        ← top 5 non-PDF URLs crawled
   ↓
-build_report
+store_findings_in_pinecone    ← embed + upsert to Pinecone (optional)
   ↓
-END
+retrieve_context_from_pinecone ← top-5 historical findings (optional)
+  ↓
+finalize_state        ← counts, duration, error summary
+  ↓
+generate_report       ← OpenAI synthesis + Markdown output
+```
+
+Each collection node (Serper, NewsAPI, RSS) fails gracefully: missing keys or network errors append to `state["errors"]` and the pipeline continues with partial results.
+
+---
+
+# Normalized Result Schema
+
+All collection tools share a single schema:
+
+```python
+{
+    "title": str,
+    "url": str,
+    "snippet": str,
+    "published_at": str | None,
+    "source": str,
+    "source_type": str,   # "organic", "news", or "rss"
+    "search_query": str,
+    "author": str | None,
+    "rank": int
+}
 ```
 
 ---
 
-# LangGraph Node Responsibilities
+# Reliability Features
 
-| Node | Responsibility |
+| Feature | Implementation |
 |---|---|
-| collect_research | Executes APIs, RSS collection, crawler logic |
-| normalize_content | Converts all outputs into unified schema |
-| deduplicate_results | Removes duplicate URLs and repeated findings |
-| validate_results | Filters invalid or incomplete records |
-| generate_summary | Uses OpenAI to synthesize findings |
-| build_report | Generates structured Markdown report |
+| Per-node graceful failure | Each node catches all exceptions, appends to errors, continues |
+| API key pre-checking | Missing keys → warning, not sys.exit |
+| Tenacity retry | All HTTP calls: Timeout, ConnectionError, 429, 5xx |
+| Output validation | validate_findings() removes missing-URL and duplicate entries |
+| URL deduplication | Normalised lowercase + trailing-slash-stripped URL comparison |
+| PDF filtering | PDF URLs excluded from crawl queue automatically |
+| Boilerplate removal | Crawler strips nav/footer/header/script/style/aside/iframe |
+| Node-level logging | START/END markers + counts on every node |
+| No secrets in logs | Keys sent via headers only, never logged |
 
 ---
 
-# Visualized LangGraph Pipeline
+# Test Coverage
+
+| Test File | Tests | Coverage |
+|---|---|---|
+| test_schemas.py | 15 | Schema normalization and field validation |
+| test_deduplication.py | 12 | URL normalization and merge deduplication |
+| test_web_crawler.py | 20 | Crawler extraction, error handling, PDF filtering |
+| test_missing_api_keys.py | 8 | Missing key behavior across all collectors |
+| test_news_api_collector.py | 60 | NewsAPI full coverage including all failure modes |
+| test_rag.py | 46 | RAG embeddings, store, retriever, graceful degradation |
+| test_report_generator.py | ~15 | Report generation, RAG context injection |
+| test_reliability.py | 73 | All failure scenarios: timeouts, malformed feeds, degraded pipeline |
+| test_validator.py | 34 | validate_findings and check_state_quality |
+| **Total** | **243** | All pass — no live API calls required |
+
+---
+
+# Report Structure
+
+Each generated report contains:
+
+1. Research Topic
+2. Executive Summary (150–250 words)
+3. Key Developments (source-backed bullets)
+4. Market Implications
+5. Technology Signals
+6. Policy and Funding Signals
+7. Competitive Notes
+8. Risks and Watchouts
+9. Source Traceability (all URLs with source type labels)
+10. Workflow Metadata (pipeline statistics table)
+
+Sample reports: `outputs/sample_reports/`
+
+---
+
+# Distribution Layer (Phase 5)
 
 ```text
-                    ┌─────────────────────┐
-                    │   User Input Topic  │
-                    └─────────┬───────────┘
-                              │
-                              ▼
-                ┌─────────────────────────┐
-                │   Research Collection   │
-                │ Serper / News / RSS     │
-                └─────────┬───────────────┘
-                          │
-                          ▼
-                ┌─────────────────────────┐
-                │   Content Normalizer    │
-                └─────────┬───────────────┘
-                          │
-                          ▼
-                ┌─────────────────────────┐
-                │  Deduplication Engine   │
-                └─────────┬───────────────┘
-                          │
-                          ▼
-                ┌─────────────────────────┐
-                │    Validation Layer     │
-                └─────────┬───────────────┘
-                          │
-                          ▼
-                ┌─────────────────────────┐
-                │    OpenAI Summarizer    │
-                └─────────┬───────────────┘
-                          │
-                          ▼
-                ┌─────────────────────────┐
-                │ Executive Report Builder│
-                └─────────┬───────────────┘
-                          │
-                          ▼
-                    Markdown Report
+FastAPI POST /run-hymind
+  ↓
+n8n Schedule Trigger (Monday 08:00)
+  ↓
+HTTP Request → ngrok → FastAPI server
+  ↓
+IF status == success
+  ↓
+Markdown → HTML (n8n built-in)
+  ↓
+Gmail send (HTML report)
+  ↓
+Google Sheets log (timestamp, title, status, channel)
 ```
-
----
-
-# OpenAI Usage
-
-The OpenAI API is currently used for:
-
-- Executive summarization
-- Topic synthesis
-- Strategic interpretation
-- Structured report generation
-
-The LLM is intentionally isolated to the analysis and synthesis layer.
-
-Deterministic preprocessing such as normalization, validation, filtering, and deduplication is handled outside the model to improve reliability and reduce hallucination risk.
-
----
-
-# Reliability Features Implemented
-
-The MVP includes several reliability focused mechanisms.
-
-## Validation
-
-- Schema enforcement
-- Empty field protection
-- Invalid URL filtering
-- Required field checks
-
-## Error Handling
-
-- API exception handling
-- Timeout handling
-- Connection failure handling
-- Graceful fallback responses
-
-## Deduplication
-
-- URL normalization
-- Trailing slash normalization
-- Duplicate result removal
-- Source merge consistency
-
-## Stability
-
-- Deterministic preprocessing
-- Isolated failures
-- Node level validation
-- Structured outputs
-
----
-
-# Testing Performed
-
-The MVP includes a dedicated automated testing layer.
-
-## Test Coverage
-
-| Test Area | Coverage |
-|---|---|
-| Schema validation | ✅ |
-| URL normalization | ✅ |
-| Deduplication | ✅ |
-| Empty results | ✅ |
-| Web crawler failures | ✅ |
-| Timeout handling | ✅ |
-| API failure isolation | ✅ |
-| Result ordering | ✅ |
-| Merge logic | ✅ |
-
----
-
-# Test Architecture
-
-```text
-tests/
-├── test_schemas.py
-├── test_deduplication.py
-├── test_web_crawler.py
-├── test_pipeline.py
-└── test_validation.py
-```
-
----
-
-# Test Results
-
-## Final Result
-
-```text
-72 passed in 0.96s
-```
-
-The tests were executed fully offline without live API calls or external dependencies.
-
-This validates:
-
-- Stable schema handling
-- Reliable node behavior
-- Consistent preprocessing
-- Safe error handling
-- Deterministic pipeline execution
 
 ---
 
@@ -284,16 +206,20 @@ This validates:
 
 | Component | Technology |
 |---|---|
-| Language | Python |
+| Language | Python 3.11+ |
 | Agent Framework | LangGraph |
-| LLM | OpenAI API |
+| LLM | OpenAI GPT-4o-mini |
 | Search API | Serper API |
 | News Aggregation | NewsAPI |
-| RSS Processing | feedparser |
-| Crawling | requests + BeautifulSoup |
-| Testing | pytest |
-| Orchestration | LangGraph |
-| Output Format | Markdown |
+| RSS Processing | feedparser + requests |
+| Crawling | requests + BeautifulSoup + lxml |
+| Vector Database | Pinecone (text-embedding-3-small) |
+| Retry Logic | tenacity |
+| Logging | Python logging + Rich |
+| HTTP API | FastAPI + uvicorn |
+| Distribution | n8n |
+| Testing | pytest (243 tests) |
+| Output Format | Markdown (HTML delivery via n8n) |
 
 ---
 
@@ -301,69 +227,34 @@ This validates:
 
 ## Why LangGraph
 
-LangGraph was selected because the workflow requires:
+LangGraph provides stateful multi-step orchestration with explicit node boundaries. Each node is isolated — one failure does not cascade. State accumulates across nodes. The graph is deterministic, testable, and extensible.
 
-- Stateful execution
-- Multi node orchestration
-- Deterministic routing
-- Scalable future expansion
-- Reliable processing pipelines
+## Why Pinecone
 
-This structure also allows future extension toward:
+The system needs persistent memory to track hydrogen market trends across weeks. Pinecone provides managed vector search, metadata filtering, and graceful degradation — the pipeline works without it configured.
 
-- Retry branches
-- Human approval nodes
-- Multi agent routing
-- Long term memory systems
-- Phase 5 n8n distribution integration
+## Why FastAPI + n8n
 
----
+The distribution layer is intentionally decoupled from the core intelligence pipeline. FastAPI exposes a clean HTTP interface. n8n handles scheduling, delivery, and logging without coupling into the Python codebase.
 
-# Current MVP Status
+## Why no PDF
 
-## Completed
-
-- Multi source research collection
-- Unified schema normalization
-- Deduplication pipeline
-- Validation layer
-- LangGraph orchestration
-- OpenAI summarization
-- Markdown report generation
-- Automated testing suite
-- Reliability focused preprocessing
-
-## Planned Next Steps
-
-- Phase 5 PDF report export
-- Phase 5 Telegram / Gmail distribution
-- Persistent vector memory
-- Historical trend comparison
-- RAG integration
-- Phase 5 n8n orchestration
-- Advanced report formatting
-- Monitoring and logging
+PDF generation adds a rendering dependency (headless Chrome or weasyprint). n8n's built-in Markdown node produces HTML directly — sufficient for email delivery without an extra tool.
 
 ---
 
 # Repository
 
-Repository:
 https://github.com/maxxeagleowl/HYMIND
 
 ---
 
-# Conclusion
+# Current State
 
-The MVP successfully demonstrates a production style autonomous research and reporting pipeline for the hydrogen industry.
+**Phase 1–5 complete. Phase 6 (documentation and submission) in progress.**
 
-The project combines:
-
-- Multi source intelligence gathering
-- LangGraph orchestration
-- Structured preprocessing
-- OpenAI based synthesis
-- Reliability focused validation
-- Automated testing
-
-The architecture is intentionally modular and extensible to support future scaling toward a fully autonomous industry intelligence platform.
+- 243 tests pass
+- 3 sample reports generated
+- Full n8n workflow exported and documented
+- All architecture docs updated to match current `src/` layout
+- Demo runbook at `docs/operations/demo_runbook.md`

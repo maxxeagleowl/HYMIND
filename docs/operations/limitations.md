@@ -197,51 +197,35 @@ Possible future additions:
 
 ---
 
-# 6. PDF & Distribution Automation Not Yet Fully Integrated
+# 6. Distribution Automation — Phase 5 Complete (PDF and Telegram Descoped)
 
 ## Current State
 
-The current MVP generates structured Markdown reports.
+Phase 5 distribution automation is implemented and operational.
 
-Phase 5 distribution automation is architecturally defined but not yet fully implemented.
+The n8n workflow (`n8n/HYMIND.json`) delivers:
 
----
-
-## Limitation
-
-The current system does not yet fully support:
-
-- Automated PDF generation
-- Automated Gmail delivery
-- Automated Telegram notifications
-- Delivery logging workflows
-- Full n8n orchestration pipeline
+- Scheduled weekly report trigger (Monday 08:00)
+- HTTP call to the FastAPI `/run-hymind` endpoint
+- Markdown to HTML conversion (n8n built-in Markdown node)
+- Gmail delivery of the HTML report
+- Google Sheets delivery logging (timestamp, report title, status, channel)
+- Error notification email on failure
 
 ---
 
-## Current Architecture Position
+## Descoped Items
 
-Distribution automation is intentionally separated from the core intelligence pipeline.
+**PDF generation** was evaluated and descoped from the MVP. The n8n Markdown-to-HTML conversion produces an email-readable format without an additional dependency. PDF output can be added in a future phase using a headless Chrome / Puppeteer integration or a dedicated PDF API.
 
-Current MVP focus:
-
-- Research quality
-- Reliability
-- RAG intelligence
-- Structured report generation
+**Telegram notifications** were descoped from the MVP. The Gmail + Google Sheets delivery path covers operational needs at the current scale. Telegram can be added in a future phase by adding a Telegram node to the n8n workflow.
 
 ---
 
-## Future Direction
+## Remaining Limitation
 
-Phase 5 introduces:
-
-- n8n orchestration
-- Markdown to PDF workflows
-- Gmail distribution
-- Telegram alerting
-- Delivery logging
-- Automated report archiving
+- **ngrok URL reconfiguration**: the exported n8n workflow contains a fixed ngrok URL. After importing the workflow, update the HTTP Request node URL to your own ngrok domain.
+- **Delivery logging in Google Sheets**: the workflow writes to a specific Google Spreadsheet ID. Update the Google Sheets node credentials and sheet reference after importing.
 
 ---
 

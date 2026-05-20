@@ -100,14 +100,6 @@ Used for:
 - Political developments
 - Funding announcements
 
-### Alpha Vantage
-
-Used for:
-
-- Financial intelligence
-- Public company monitoring
-- Market related analysis
-
 ---
 
 ## RSS Feed Collection
@@ -313,21 +305,27 @@ This layer is optional for the MVP core workflow and focuses on external deliver
 
 ---
 
-## Example Workflow
+## Implemented Workflow (Phase 5)
 
 ```text
 Markdown Report
     ↓
-n8n Trigger
+FastAPI /run-hymind endpoint
     ↓
-PDF Generation
+n8n Schedule Trigger (Monday 08:00)
+    ↓
+HTTP Request → FastAPI server (via ngrok)
+    ↓
+IF status == success
+    ↓
+Markdown → HTML (n8n built-in conversion)
     ↓
 Gmail Delivery
     ↓
-Telegram Alert
-    ↓
-Delivery Logging
+Google Sheets Delivery Logging
 ```
+
+**Note on PDF:** PDF generation was evaluated and descoped from the MVP. The n8n workflow converts Markdown to HTML inline using n8n's built-in Markdown node, producing an email-readable format without an additional dependency.
 
 ---
 
@@ -337,28 +335,33 @@ Delivery Logging
 HYMIND/
 │
 ├── src/
-│   ├── hymind/
-│   │   ├── collectors/
-│   │   ├── rag/
-│   │   ├── reporting/
-│   │   ├── workflows/
-│   │   ├── tools/
-│   │   └── validation/
+│   ├── api/                  # FastAPI HTTP wrapper (Phase 5)
+│   ├── rag/                  # Pinecone RAG layer (Phase 3)
+│   ├── reporting/            # Report generator + output validator (Phase 4)
+│   ├── workflows/            # LangGraph pipeline + AgentState
+│   ├── tools/                # Serper, NewsAPI, RSS, crawler, collector
+│   ├── utils/                # Shared logger
+│   └── main.py               # CLI entry point
+│
+├── n8n/                      # Exported n8n workflow JSON files (Phase 5)
 │
 ├── docs/
 │   ├── architecture/
 │   ├── operations/
 │   ├── roadmap/
-│   └── stories.md
+│   └── planning/
+│       └── stories.md
 │
 ├── memory/
 │   └── active/
 │
 ├── skills/
 │
-├── tests/
+├── tests/                    # 243-test automated suite
 │
 ├── outputs/
+│   ├── reports/              # Generated reports
+│   └── sample_reports/       # 3 example reports
 │
 ├── AGENTS.md
 ├── README.md

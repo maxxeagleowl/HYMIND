@@ -1,6 +1,6 @@
 """NewsAPI client wrapper for HYMIND with retry, timeout, and normalization.
 
-Result schema matches src/hymind/tools/serper_search.py so outputs from both
+Result schema matches src/tools/serper_search.py so outputs from both
 tools can be merged into a single list by downstream workflow nodes.
 """
 

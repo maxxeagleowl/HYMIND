@@ -33,7 +33,7 @@ Serper and RSS were already integrated in Phase 1. NewsAPI completes the three-s
 NEWS_API_KEY=your_key_here
 ```
 
-The key is read from the environment by `_get_api_key()` in `src/hymind/tools/news_api.py`.
+The key is read from the environment by `_get_api_key()` in `src/tools/news_api.py`.
 
 - If the key is absent at the tool level (`news_api.search()`), the function calls `sys.exit(1)` with an actionable error message.
 - If the key is absent at the workflow node level (`collect_news` in `research_workflow.py`), the node logs a warning and returns `[]` so the pipeline continues using Serper and RSS results.
@@ -64,7 +64,7 @@ This schema matches Serper and RSS outputs so all three can be merged directly.
 
 ## Collector Abstraction
 
-`src/hymind/tools/collector.py` provides:
+`src/tools/collector.py` provides:
 
 ### CollectorProtocol
 

@@ -34,9 +34,12 @@ Gmail node  →  report_content sent as email body
 
 | File | Purpose |
 |---|---|
-| `src/hymind/api/server.py` | FastAPI server with `/run-hymind` and `/health` endpoints |
-| `src/hymind/api/__init__.py` | Package marker |
-| `scripts/run_api.py` | Convenience start script |
+| `src/api/server.py` | FastAPI server with `/run-hymind` and `/health` endpoints |
+| `src/api/__init__.py` | Package marker |
+| `scripts/run_api.py` | Convenience start script (uvicorn) |
+| `start_hymind_api.py` | One-shot: starts FastAPI + ngrok + prints n8n config |
+| `n8n/HYMIND.json` | Exported n8n workflow (Schedule → HTTP → Gmail → Sheets) |
+| `n8n/Global Error Handler.json` | n8n error handler workflow |
 
 ---
 
@@ -47,10 +50,13 @@ Gmail node  →  report_content sent as email body
 C:\Users\nest\.conda\envs\hymind\python.exe -m pip install fastapi "uvicorn[standard]"
 
 # Start server
-uvicorn src.hymind.api.server:app --host 0.0.0.0 --port 8000 --reload
+uvicorn src.api.server:app --host 0.0.0.0 --port 8000 --reload
 
 # Or via script
-C:\Users\nest\.conda\envs\hymind\python.exe scripts/run_api.py
+python scripts/run_api.py
+
+# Or start server + ngrok together
+python start_hymind_api.py
 ```
 
 Interactive API docs: `http://localhost:8000/docs`
@@ -168,14 +174,29 @@ Condition: `{{$json.status}}` equals `success`
 - True branch → Gmail send node
 - False branch → error alert or stop
 
+### Markdown → HTML conversion node
+
+The n8n workflow includes a **Markdown** node between the IF check and the Gmail send node. It converts `{{$json.report_content}}` from Markdown to HTML. The Gmail node then sends the HTML body.
+
+**PDF delivery:** PDF generation was evaluated and descoped from the MVP. The Markdown → HTML conversion produces an email-readable format without an additional dependency.
+
 ### Gmail node — body expression
 
 ```
 {{$json.report_content}}
 ```
 
-The `report_content` field contains the full Markdown report. Gmail renders
-plain text; for formatted HTML, add a Markdown-to-HTML conversion node.
+This is pre-converted to HTML by the Markdown node upstream.
+
+### Google Sheets logging node
+
+After a successful send, the workflow appends a row to a Google Sheet with:
+- `timestamp` — delivery time
+- `report_title` — from the API response
+- `status` — `sent`
+- `delivery_channel` — `gmail`
+
+Update the Google Sheets node with your own spreadsheet ID and credentials after importing the workflow.
 
 ---
 

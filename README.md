@@ -2,13 +2,11 @@
 
 **Autonomous Hydrogen Engineering Intelligence Agent**
 
-HYMIND collects external market, technology, and policy signals from multiple sources, analyzes them using OpenAI, and produces structured executive intelligence reports for the hydrogen and fuel cell industry.
+HYMIND collects external market, technology, and policy signals from multiple sources, analyzes them using OpenAI, and produces structured executive intelligence reports for the hydrogen and fuel cell industry. A FastAPI HTTP wrapper and n8n workflow automate weekly scheduled delivery via Gmail.
 
 ---
 
-## Current Status
-
-**Phase 1 + Phase 2 + Phase 3 Completed**
+## Current Status — Phase 1–5 Complete
 
 | Capability | Phase | Status |
 |---|---|---|
@@ -21,12 +19,15 @@ HYMIND collects external market, technology, and policy signals from multiple so
 | Markdown report generation | 1 | Done |
 | Collector abstraction + validation layer | 2 | Done |
 | Pinecone RAG storage and retrieval | 3 | Done |
-| Automated test suite (170 tests) | 1–3 | Done |
+| Output validation layer + reliability hardening | 4 | Done |
+| 243-test automated suite | 1–4 | Done |
+| FastAPI HTTP wrapper | 5 | Done |
+| n8n scheduled workflow + Gmail delivery | 5 | Done |
+| Google Sheets delivery logging | 5 | Done |
+
+Phase 6 is Documentation, Demo and Project Finalization (current phase).
 
 ---
-
-Phase 4 is reserved for reliability, validation, testing, logging, retry logic, and production hardening.
-Phase 5 owns the optional n8n distribution layer, PDF generation, Gmail delivery, Telegram alerts, and delivery logging.
 
 ## Architecture Overview
 
@@ -58,15 +59,24 @@ flowchart TD
         R2[outputs/reports/\nMarkdown Executive Report]
     end
 
+    subgraph Distribution["Phase 5 — Distribution Layer"]
+        D1[FastAPI server\nsrc/api/server.py]
+        D2[n8n workflow\nSchedule → HTTP → Gmail]
+        D3[Google Sheets\nDelivery logging]
+    end
+
     N2 -. calls .-> T1
     N3 -. calls .-> T2
     N4 -. calls .-> T3
     N6 -. calls .-> T4
     WF --> R1
     R1 --> R2
+    R2 --> D1
+    D1 --> D2
+    D2 --> D3
 ```
 
-The core LangGraph pipeline ends at Markdown report generation. Phase 5 adds the optional n8n-based distribution layer on top of that output.
+The core LangGraph pipeline ends at Markdown report generation. The Phase 5 distribution layer runs on top of that output via n8n.
 
 ---
 
@@ -146,34 +156,19 @@ If `PINECONE_API_KEY` or `OPENAI_API_KEY` is absent, both RAG nodes emit a warni
 
 ---
 
-## Tool Stack
-
-| Layer | Tool | Purpose |
-|---|---|---|
-| Language | Python 3.11+ | Core implementation |
-| Agent framework | LangGraph 1.x | State machine workflow orchestration |
-| LLM | OpenAI GPT-4o-mini | Research synthesis and report generation |
-| Web search | Serper API | Google search results |
-| News | NewsAPI | News article retrieval |
-| RSS | feedparser + requests | Hydrogen industry feed ingestion |
-| Web crawling | requests + BeautifulSoup + lxml | Article content extraction |
-| Retry logic | tenacity | Exponential back-off on transient failures |
-| Logging | Python logging + Rich | Structured console and file logging |
-| Env config | python-dotenv | Secret and config management |
-
----
-
-## Reliability Features
+## Reliability Features (Phase 4)
 
 - **Graceful failure per source**: each collection node catches all exceptions and appends to `errors`/`warnings` — one failing source never blocks others
 - **API key pre-checking**: missing keys in workflow nodes become warnings, not `sys.exit` — the pipeline completes with partial results
 - **Tenacity retry**: all external HTTP calls retry on `Timeout`, `ConnectionError`, HTTP 429, and HTTP 5xx with exponential back-off
+- **Output validation layer**: `validate_findings()` removes URL-absent and duplicate entries before report synthesis; `check_state_quality()` assesses state completeness
 - **URL deduplication**: merged results are deduplicated by normalised URL (lowercase, trailing-slash stripped) before crawling
 - **PDF pre-filtering**: PDF URLs are excluded from the crawl queue automatically
 - **Boilerplate removal**: web crawler strips `script`, `style`, `nav`, `footer`, `header`, `aside`, `form`, and `iframe` before text extraction
 - **JS-rendered site detection**: crawler returns `extraction_success=False` for shell HTML pages and continues
-- **Structured logging**: every tool and workflow node logs `start`, `complete`, `result count`, and `error` events to both console (Rich) and `logs/hymind.log` (DEBUG level)
+- **Node-level logging**: every workflow node emits `=== Node START ===` and `=== Node END ===` markers plus counts and error events to both console (Rich) and `logs/hymind.log` (DEBUG level)
 - **No secrets in logs**: API keys sent via headers, not URL query params; keys are never logged
+- **243 automated tests**: covers all collectors, workflow nodes, RAG layer, output validator, and failure scenarios (timeouts, malformed feeds, node isolation, degraded pipeline)
 
 ---
 
@@ -191,6 +186,27 @@ Each generated report (`outputs/reports/YYYYMMDD_HHMMSS_hymind_report.md`) conta
 8. **Risks and Watchouts** — identified uncertainties and gaps
 9. **Source Traceability** — all contributing URLs with type labels
 10. **Workflow Metadata** — pipeline statistics table (programmatically generated)
+
+Sample reports are available in `outputs/sample_reports/`.
+
+---
+
+## Tool Stack
+
+| Layer | Tool | Purpose |
+|---|---|---|
+| Language | Python 3.11+ | Core implementation |
+| Agent framework | LangGraph 1.x | State machine workflow orchestration |
+| LLM | OpenAI GPT-4o-mini | Research synthesis and report generation |
+| Web search | Serper API | Google search results |
+| News | NewsAPI | News article retrieval |
+| RSS | feedparser + requests | Hydrogen industry feed ingestion |
+| Web crawling | requests + BeautifulSoup + lxml | Article content extraction |
+| Retry logic | tenacity | Exponential back-off on transient failures |
+| Logging | Python logging + Rich | Structured console and file logging |
+| Env config | python-dotenv | Secret and config management |
+| HTTP API | FastAPI + uvicorn | HTTP wrapper for n8n integration |
+| Distribution | n8n | Scheduled trigger, Gmail delivery, Google Sheets logging |
 
 ---
 
@@ -235,6 +251,9 @@ PINECONE_INDEX_NAME=hymind-research
 PINECONE_CLOUD=aws
 PINECONE_REGION=us-east-1
 
+# Optional — API server authentication (Phase 5)
+HYMIND_API_KEY=
+
 LOG_LEVEL=INFO
 MAX_SEARCH_RESULTS=10
 MAX_ARTICLES_PER_RUN=10
@@ -259,80 +278,49 @@ Without Pinecone configured, the pipeline skips RAG storage and retrieval silent
 
 ```powershell
 # Default topic
-C:\Users\nest\.conda\envs\hymind\python.exe -m hymind.main
+python -m main
 
 # Custom topic
-C:\Users\nest\.conda\envs\hymind\python.exe -m hymind.main "hydrogen funding Germany 2026"
+python -m main "hydrogen funding Germany 2026"
 ```
 
 Output: a Markdown report in `outputs/reports/`.
 
----
+### Run the tests
 
-## Repository Layout
+```powershell
+# Full test suite (243 tests, no live API calls)
+pytest tests/ -v
 
-```text
-HYMIND/
-├── src/hymind/
-│   ├── tools/
-│   │   ├── openai_client.py      # OpenAI wrapper with retry
-│   │   ├── serper_search.py      # Serper web search
-│   │   ├── news_api.py           # NewsAPI article retrieval
-│   │   ├── rss_reader.py         # RSS/Atom feed ingestion
-│   │   ├── web_crawler.py        # Article content extraction
-│   │   └── collector.py          # CollectorProtocol + validation layer (Phase 2)
-│   ├── rag/
-│   │   ├── schemas.py            # StoredFinding / RetrievedFinding dataclasses (Phase 3)
-│   │   ├── embeddings.py         # OpenAI embeddings client (Phase 3)
-│   │   ├── pinecone_store.py     # Pinecone upsert and query (Phase 3)
-│   │   └── retriever.py          # High-level store_from_state / retrieve_context (Phase 3)
-│   ├── workflows/
-│   │   ├── state.py              # AgentState TypedDict
-│   │   └── research_workflow.py  # LangGraph 9-node pipeline
-│   ├── reporting/
-│   │   └── report_generator.py   # OpenAI report synthesis (includes RAG context)
-│   └── utils/
-│       └── logger.py             # Shared structured logger
-├── docs/
-│   ├── architecture/
-│   ├── roadmap/
-│   ├── operations/
-│   ├── project_state.md
-│   └── decision_log.md
-├── skills/
-│   ├── governance/               # Engineering behavior rules
-│   └── operational/              # Domain execution rules
-├── memory/active/                # Session operational memory
-├── outputs/reports/              # Generated Markdown reports (gitignored)
-├── logs/                         # Runtime log files (gitignored)
-├── tests/                        # Automated test suite (72 tests)
-├── .env.example                  # Configuration template
-├── requirements.txt
-└── pyproject.toml
+# Phase 4 reliability and validator tests only
+pytest tests/test_reliability.py tests/test_validator.py -v
 ```
 
 ---
 
 ## Phase 5 — API Server and n8n Integration
 
-HYMIND exposes a FastAPI HTTP wrapper so n8n (or any HTTP client) can trigger
-a research run and receive the Markdown report content in the response.
+HYMIND exposes a FastAPI HTTP wrapper so n8n (or any HTTP client) can trigger a research run and receive the Markdown report content in the response. An n8n workflow then converts the Markdown to HTML and delivers it via Gmail, with delivery status logged to Google Sheets.
+
+**Note:** PDF generation was evaluated and descoped from the MVP. The n8n workflow uses its built-in Markdown node to convert the report to HTML inline before sending via Gmail. This avoids an additional dependency and produces an email-readable format without a separate conversion step.
 
 ### Start the API server locally
 
 ```powershell
-# Install new dependencies first (one-time)
+# Install API dependencies (one-time, if not already installed)
 C:\Users\nest\.conda\envs\hymind\python.exe -m pip install fastapi "uvicorn[standard]"
 
 # Start the server
-uvicorn src.hymind.api.server:app --host 0.0.0.0 --port 8000 --reload
+uvicorn src.api.server:app --host 0.0.0.0 --port 8000 --reload
 
 # Alternative: use the convenience script
-C:\Users\nest\.conda\envs\hymind\python.exe scripts/run_api.py
+python scripts/run_api.py
+
+# Alternative: start server + ngrok in one step
+python start_hymind_api.py
 ```
 
-The server starts at `http://localhost:8000`.  The interactive docs are at
-`http://localhost:8000/docs`.
+The server starts at `http://localhost:8000`. The interactive docs are at `http://localhost:8000/docs`.
 
 ### Test the endpoint locally
 
@@ -350,46 +338,31 @@ curl http://localhost:8000/health
 
 ### Expose to n8n via ngrok
 
-n8n cannot reach `localhost` directly.  Use ngrok to create a public tunnel:
+n8n cannot reach `localhost` directly. Use ngrok to create a public tunnel:
 
 ```powershell
 # Install ngrok from https://ngrok.com/download, then:
 ngrok http 8000
+
+# Or with a fixed domain (if you have one configured):
+ngrok http --domain=YOUR-DOMAIN.ngrok-free.app 8000
 ```
 
-ngrok prints a public URL like `https://abc123.ngrok-free.app`.  Use that URL
-in the n8n HTTP Request node.
+ngrok prints a public URL like `https://abc123.ngrok-free.app`. Use that URL in the n8n HTTP Request node.
 
-### n8n HTTP Request node configuration
+### n8n workflow
 
-| Field | Value |
-|---|---|
-| Method | `POST` |
-| URL | `https://YOUR-NGROK-URL.ngrok-free.app/run-hymind` |
-| Body Content Type | `JSON` |
-| Authentication | None (or Header Auth if `HYMIND_API_KEY` is set) |
+The exported n8n workflow is in `n8n/HYMIND.json`. Import it into your n8n instance. The workflow:
 
-Request body:
+1. **Schedule Trigger** — fires every Monday at 08:00
+2. **HTTP Request** — `POST /run-hymind` to the ngrok URL (update this URL to your own ngrok domain)
+3. **IF** — checks `$json.status == success`
+4. **Markdown → HTML** — converts the Markdown report content to HTML
+5. **Gmail: Send report** — sends the HTML report to the configured recipient
+6. **Google Sheets: Log delivery** — appends timestamp, report title, and delivery status to a tracking sheet
+7. **Gmail: Send error alert** — fires on the failure branch
 
-```json
-{
-  "topic": "weekly hydrogen and fuel cell market intelligence",
-  "report_type": "weekly_executive",
-  "run_mode": "scheduled"
-}
-```
-
-Success condition for n8n IF node:
-
-```
-{{$json.status}} equals success
-```
-
-Gmail body expression (passes the full Markdown report):
-
-```
-{{$json.report_content}}
-```
+See `docs/operations/n8n_workflow.md` for full configuration instructions.
 
 ### API response
 
@@ -429,16 +402,90 @@ When set, every request must include the header:
 x-api-key: your-secret-key
 ```
 
-In n8n: add a Header Auth credential with the key `x-api-key` and your value.
+In n8n: add a Header Auth credential with the key `x-api-key` and your value. The exported workflow already references a Header Auth credential — recreate it with your key.
 
 Leave `HYMIND_API_KEY` empty for unauthenticated local development.
+
+---
+
+## Repository Layout
+
+```text
+HYMIND/
+├── src/
+│   ├── api/
+│   │   └── server.py             # FastAPI wrapper (Phase 5)
+│   ├── tools/
+│   │   ├── openai_client.py      # OpenAI wrapper with retry
+│   │   ├── serper_search.py      # Serper web search
+│   │   ├── news_api.py           # NewsAPI article retrieval
+│   │   ├── rss_reader.py         # RSS/Atom feed ingestion
+│   │   ├── web_crawler.py        # Article content extraction
+│   │   └── collector.py          # CollectorProtocol + validation layer
+│   ├── rag/
+│   │   ├── schemas.py            # StoredFinding / RetrievedFinding dataclasses
+│   │   ├── embeddings.py         # OpenAI embeddings client
+│   │   ├── pinecone_store.py     # Pinecone upsert and query
+│   │   └── retriever.py          # High-level store_from_state / retrieve_context
+│   ├── workflows/
+│   │   ├── state.py              # AgentState TypedDict
+│   │   └── research_workflow.py  # LangGraph 9-node pipeline
+│   ├── reporting/
+│   │   ├── report_generator.py   # OpenAI report synthesis (includes RAG context)
+│   │   └── validator.py          # Output validation layer (Phase 4)
+│   ├── utils/
+│   │   └── logger.py             # Shared structured logger
+│   └── main.py                   # CLI entry point
+├── n8n/
+│   ├── HYMIND.json               # Main n8n workflow (Schedule → HTTP → Gmail)
+│   └── Global Error Handler.json # n8n error handler workflow
+├── docs/
+│   ├── architecture/             # System and API architecture docs
+│   ├── roadmap/                  # Phase roadmap and sprint plan
+│   ├── operations/               # Task board, limitations, workflow docs, demo runbook
+│   ├── planning/
+│   │   └── stories.md            # User stories and Agile artifacts
+│   ├── project_state.md          # Current phase status
+│   └── decision_log.md           # Architecture decision record
+├── skills/
+│   ├── governance/               # Engineering behavior rules
+│   └── operational/              # Domain execution rules
+├── memory/active/                # Session operational memory
+├── outputs/
+│   ├── reports/                  # Generated Markdown reports (gitignored, kept by pattern)
+│   └── sample_reports/           # 3 example reports included in repo
+├── tests/                        # 243-test automated suite
+├── scripts/
+│   └── run_api.py                # uvicorn convenience start script
+├── start_hymind_api.py           # One-shot: starts FastAPI + ngrok + prints n8n config
+├── AGENTS.md                     # Agent runtime instructions
+├── CLAUDE.md                     # Claude Code session instructions
+├── .env.example                  # Configuration template
+├── requirements.txt
+└── pyproject.toml
+```
+
+---
+
+## Known Limitations
+
+- **Single-industry scope**: HYMIND is focused on hydrogen and fuel cell intelligence only
+- **No real-time streaming**: reports are batch-generated, not event-driven
+- **JS-rendered sites**: crawler returns `extraction_success=False` for React/Next.js shells — crawl success rate depends on URL mix
+- **Pinecone manual setup**: the `hymind-research` index must be created manually before the RAG layer activates
+- **LLM dependency**: hallucination risk is mitigated by RAG grounding and source traceability but not eliminated
+- **No enterprise auth**: local API key management only; no SSO or RBAC
+- **ngrok URL reconfiguration**: the n8n workflow JSON contains a fixed ngrok URL; update the HTTP Request node URL after importing the workflow
+
+Full limitations are in `docs/operations/limitations.md`.
 
 ---
 
 ## Development Notes
 
 - Do not commit `.env` or any file containing real API keys
-- Generated reports land in `outputs/reports/` — excluded from git
+- Generated reports land in `outputs/reports/` — kept in git by `*.md` pattern
 - Log files land in `logs/` — excluded from git
 - Keep changes small and focused; the workflow is the integration point
-- Phase 1–4 MVP is complete; Phase 5 adds the API wrapper, n8n scheduling, PDF export, and Gmail delivery
+- `python -m main` runs the full pipeline after `pip install -e .`
+- `uvicorn src.api.server:app --host 0.0.0.0 --port 8000 --reload` starts the API server

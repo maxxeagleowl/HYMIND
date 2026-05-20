@@ -43,23 +43,28 @@ Build an autonomous hydrogen engineering and market intelligence agent that gath
 
 ## Phase 5 Stories
 
-| ID | User Story | Estimate | Dependencies | Definition of Done |
-| --- | --- | --- | --- | --- |
-| US-09 | As an operator, I want an n8n workflow to trigger distribution from a completed Markdown report so that delivery starts only after the core research pipeline finishes. | 2 | US-08, completed Markdown report generation | The workflow reads an existing Markdown report path, triggers reliably, and logs each run. |
-| US-10 | As an operator, I want Markdown-to-PDF conversion and Gmail delivery so that executive reports can be distributed in a polished format. | 3 | US-09 | A PDF is generated into `outputs/`, Gmail delivery succeeds or retries cleanly, and delivery outcomes are logged. |
-| US-11 | As an operator, I want optional Telegram alerts, delivery logging, and archived workflow artifacts so that stakeholders and operators have lightweight notification and traceability. | 2 | US-09, US-10 | Telegram can be enabled or skipped safely, delivery logs are preserved, and reusable workflow JSON plus screenshots are documented. |
+| ID | User Story | Estimate | Dependencies | Status | Definition of Done |
+| --- | --- | --- | --- | --- | --- |
+| US-09 | As an operator, I want an n8n workflow to trigger a report run on a weekly schedule so that delivery happens automatically without manual intervention. | 2 | US-08 | Done | n8n workflow JSON exported to `n8n/HYMIND.json`. Schedule Trigger fires Monday 08:00. HTTP Request calls FastAPI `/run-hymind`. IF node checks success. |
+| US-10 | As an operator, I want Gmail delivery of each completed report so that stakeholders receive it immediately after generation. | 3 | US-09 | Done | Gmail node sends HTML-converted report. Markdown→HTML conversion handled in-workflow by n8n Markdown node. PDF descoped. |
+| US-11 | As an operator, I want delivery outcomes logged so that I can trace what was sent and when. | 2 | US-10 | Done | Google Sheets node appends timestamp, report title, status, and delivery channel on each successful send. Error alert Gmail fires on failure. Telegram descoped from MVP. |
 
 ## Phase 6 Stories
 
-| ID | User Story | Estimate | Dependencies | Definition of Done |
-| --- | --- | --- | --- | --- |
-| US-12 | As a developer, I want a finalized README and complete architecture documentation so that any reviewer or instructor can understand and reproduce the system. | 2 | US-11 | README covers setup, configuration, architecture, and run instructions. Architecture diagrams are accurate and current. |
-| US-13 | As a developer, I want all AGENTS.md files, skills/, and planning artifacts finalized so that the agent-facing specification and Agile artifacts meet submission requirements. | 1 | US-12 | AGENTS.md reflects final system state, skills/ is complete, stories.md has estimates and definitions of done for every phase. |
-| US-14 | As a developer, I want a working end-to-end demo and presentation material so that the project can be demonstrated professionally in 5–7 minutes. | 2 | US-12, US-13 | Demo runs without error from trigger to report, presentation covers architecture decisions and reliability features, repository is submission-ready. |
+| ID | User Story | Estimate | Dependencies | Status | Definition of Done |
+| --- | --- | --- | --- | --- | --- |
+| US-12 | As a developer, I want a finalized README and complete architecture documentation so that any reviewer or instructor can understand and reproduce the system. | 2 | US-11 | Done | README covers setup, configuration, run instructions, test commands, n8n usage, output locations, and known limitations. Architecture docs match current `src/` layout. |
+| US-13 | As a developer, I want all AGENTS.md files, skills/, and planning artifacts finalized so that the agent-facing specification and Agile artifacts meet submission requirements. | 1 | US-12 | Done | AGENTS.md reflects final system state. skills/ is complete. stories.md has estimates and definitions of done for every phase. |
+| US-14 | As a developer, I want a working end-to-end demo runbook and submission-ready repository so that the project can be demonstrated clearly and submitted. | 2 | US-12, US-13 | In Progress | Demo runbook in `docs/operations/demo_runbook.md`. Repository clean — no stale files, no broken paths, no secrets committed. All docs reflect current implementation. |
 
-## Definition Of Done For The Phase
+## Definition Of Done For The Project
 
-- Repository is scaffolded cleanly.
-- Documentation is present and understandable.
-- No secrets are committed.
-- The repo is ready for Phase 1 implementation work.
+- Repository is clean and well-structured.
+- README explains setup, run, test, n8n usage, and limitations.
+- Architecture documentation matches actual `src/` layout.
+- Planning artifacts (stories, task board) reflect final state.
+- Sample reports demonstrate actual output quality.
+- n8n workflow JSON is exported and documented.
+- No secrets committed.
+- 243 automated tests pass.
+- Demo runbook exists and is accurate.
