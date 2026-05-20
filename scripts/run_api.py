@@ -1,4 +1,4 @@
-"""Convenience script to start the HYMIND FastAPI server with uvicorn.
+r"""Convenience script to start the HYMIND FastAPI server with uvicorn.
 
 Usage:
     C:\Users\nest\.conda\envs\hymind\python.exe scripts/run_api.py
@@ -6,8 +6,8 @@ Usage:
 Or directly with uvicorn:
     uvicorn src.hymind.api.server:app --host 0.0.0.0 --port 8000 --reload
 
-Then expose to n8n via ngrok:
-    ngrok http 8000
+Then expose to n8n via ngrok (fixed domain):
+    ngrok http --domain=take-jury-plot.ngrok-free.dev 8000
 """
 
 import subprocess
