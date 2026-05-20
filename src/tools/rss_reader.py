@@ -25,7 +25,7 @@ logger = get_logger(__name__)
 _TIMEOUT: int = 20
 _MAX_RETRIES: int = 2
 _RETRY_WAIT: int = 3
-_USER_AGENT: str = "HYMIND/0.1 (hydrogen intelligence agent)"
+_USER_AGENT: str = "HYMIND/0.1 (hydrogen market intelligence)"
 
 _HTML_TAG_RE = re.compile(r"<[^>]+>")
 _WHITESPACE_RE = re.compile(r"\s+")

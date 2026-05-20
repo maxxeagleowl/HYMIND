@@ -34,7 +34,7 @@ logger = get_logger("hymind.api")
 
 app = FastAPI(
     title="HYMIND API",
-    description="HTTP wrapper for the HYMIND autonomous hydrogen intelligence agent.",
+    description="HTTP wrapper for the HYMIND hydrogen market intelligence platform.",
     version="1.0.0",
 )
 

@@ -2,7 +2,7 @@
 
 ## Sprint Goal
 
-Build the Phase 1 MVP foundation for the HYMIND autonomous hydrogen intelligence agent.
+Build the Phase 1 MVP foundation for the HYMIND autonomous hydrogen market intelligence platform.
 
 The sprint focuses on:
 

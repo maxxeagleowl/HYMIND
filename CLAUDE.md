@@ -2,11 +2,11 @@
 
 ## Project Identity
 
-HYMIND is an autonomous Hydrogen Engineering Intelligence Agent.
+HYMIND is an autonomous Hydrogen Market Intelligence & Data platform.
 
-The system researches, analyzes, synthesizes, and generates executive level intelligence reports for the hydrogen and fuel cell industry.
+The system researches, analyzes, synthesizes, and generates executive-level intelligence reports for the hydrogen and fuel cell industry.
 
-The project focuses on autonomous market intelligence, technical trend analysis, competitor monitoring, funding tracking, and policy intelligence.
+The project focuses on autonomous market intelligence, competitor monitoring, policy and funding tracking, technical trend analysis, and strategic data synthesis.
 
 ---
 
@@ -277,4 +277,4 @@ When uncertain prioritize:
 
 # Long Term Vision
 
-HYMIND should evolve into a production capable autonomous industry intelligence platform for hydrogen engineering and market research.
+HYMIND should evolve into a production-capable autonomous hydrogen market intelligence and data platform, covering market dynamics, competitor tracking, policy monitoring, funding intelligence, and technical trend analysis.

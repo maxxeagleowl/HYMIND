@@ -1,7 +1,7 @@
 # MVP Summary
 
 ## HYMIND
-### Hydrogen Engineering Intelligence Agent
+### Hydrogen Market Intelligence & Data
 
 ---
 

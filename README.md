@@ -1,8 +1,8 @@
 # HYMIND
 
-**Autonomous Hydrogen Engineering Intelligence Agent**
+**Hydrogen Market Intelligence & Data**
 
-HYMIND collects external market, technology, and policy signals from multiple sources, analyzes them using OpenAI, and produces structured executive intelligence reports for the hydrogen and fuel cell industry. A FastAPI HTTP wrapper and n8n workflow automate weekly scheduled delivery via Gmail.
+HYMIND collects external market, technology, policy, and competitor signals from multiple sources, analyzes them using OpenAI, and produces structured executive intelligence reports for the hydrogen and fuel cell industry. A FastAPI HTTP wrapper and n8n workflow automate weekly scheduled delivery via Gmail.
 
 ---
 

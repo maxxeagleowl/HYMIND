@@ -6,11 +6,11 @@ Read CLAUDE.md before starting any session work.
 
 ## Project Identity
 
-HYMIND is an autonomous hydrogen engineering intelligence and executive reporting system.
+HYMIND is an autonomous hydrogen market intelligence and data platform.
 
-The project focuses on reliable multi source research, structured intelligence synthesis, executive level reporting, and persistent operational memory.
+The project focuses on reliable multi-source research, structured intelligence synthesis, executive-level reporting, competitor monitoring, policy tracking, and persistent operational memory.
 
-The system is designed as a production style autonomous research platform rather than a simple AI demo.
+The system is designed as a production-style autonomous market intelligence platform, not a simple AI demo.
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## Product Goal
 
-Build an autonomous hydrogen engineering and market intelligence agent that gathers information from multiple sources, analyzes it, and produces structured executive reports.
+Build an autonomous hydrogen market intelligence and data platform that gathers information from multiple sources, analyzes it, and produces structured executive intelligence reports.
 
 ## Phase 0 Stories
 

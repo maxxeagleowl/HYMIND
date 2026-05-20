@@ -2,7 +2,7 @@
 
 # Overview
 
-HYMIND is an autonomous hydrogen market and engineering intelligence system built around a modular multi layer architecture.
+HYMIND is an autonomous hydrogen market intelligence and data platform built around a modular multi-layer architecture.
 
 The system combines:
 
