@@ -17,7 +17,7 @@ from reporting.report_generator import generate_report
 
 logger = get_logger("hymind.main")
 
-_DEFAULT_TOPIC: str = "hydrogen fuel cell market Europe 2026"
+_DEFAULT_TOPIC: str = "hydrogen fuel cell market intelligence Europe 2026"
 
 
 def smoke_test_full_pipeline(topic: str) -> None:

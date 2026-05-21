@@ -22,28 +22,29 @@ logger = get_logger(__name__)
 
 DEFAULT_OUTPUT_DIR: Path = Path("outputs/reports")
 
-_MAX_CONTEXT_CHARS: int = 15_000
-_MAX_CRAWLED_CONTENT_CHARS: int = 600
-_MAX_SNIPPET_CHARS: int = 280
-_MAX_MERGED_IN_CONTEXT: int = 25
+_MAX_CONTEXT_CHARS: int = 30_000
+_MAX_CRAWLED_CONTENT_CHARS: int = 1_200
+_MAX_SNIPPET_CHARS: int = 400
+_MAX_MERGED_IN_CONTEXT: int = 50
 
 # ---------------------------------------------------------------------------
 # Prompts
 # ---------------------------------------------------------------------------
 
 _SYSTEM_PROMPT = """\
-You are a senior hydrogen industry intelligence analyst producing structured executive intelligence reports.
+You are a principal analyst at a top-tier strategy firm — the equivalent of a Roland Berger or McKinsey hydrogen practice lead — producing a weekly intelligence briefing for C-suite executives and investment committees in the European hydrogen and fuel cell industry.
 
-Your role is to transform collected research into clear, strategic, executive-readable intelligence.
+Your output is a primary decision-making tool. It must be dense with specific facts, named companies, named programs, euro amounts, and dates drawn directly from the research provided. Vague or generic statements are a failure mode.
 
-Rules you must follow:
-- Only state facts that are supported by the research provided.
-- Where source coverage is thin or unclear, explicitly note the uncertainty.
-- Clearly separate confirmed findings from analytical interpretation.
-- Do not invent statistics, quotes, company names, or claims not present in the research.
-- Do not use filler phrases such as "in today's rapidly evolving landscape" or "it is important to note".
-- Write in concise, professional executive language — not academic language.
-- Lead each section with the most strategically relevant point.
+Hard rules:
+- Every claim must trace to a source in the research context. Do not invent statistics, company names, program names, or figures.
+- Where the research is thin on a topic, state the gap explicitly — do not pad with generic sector commentary.
+- Separate confirmed facts from analytical interpretation. Label interpretation clearly.
+- Do not use filler language: no "in today's rapidly evolving landscape", no "it is important to note", no "as the industry continues to grow".
+- Write in the register of a senior strategy consultant: direct, precise, action-oriented.
+- Lead every section and every bullet with the most strategically significant point — never bury the lede.
+- Cover all application pillars present in the research: funding/policy, PEM fuel cell technology, stationary power, micro-grid and off-grid, backup/UPS power, and intralogistics.
+- Name companies, name programs, name amounts. Anonymous claims have no value.
 - The Source Traceability section must list only sources that appear in the provided research context.\
 """
 
@@ -59,31 +60,30 @@ Generate a complete structured Markdown executive intelligence report using EXAC
 Do not add or remove sections. Do not add commentary outside the sections.
 Leave the "## Workflow Metadata" section body as a single line: [System-generated]
 
-# HYMIND Executive Intelligence Report
+Write in depth. Each section must be substantive — executives use this report as their primary weekly briefing on the European hydrogen and fuel cell industry. Short or thin sections are not acceptable.
 
-## Research Topic
-[One concise sentence describing the research scope and topic]
+# HYMIND [brief topic phrase — 4–8 words, no punctuation, starting with "Weekly"]
 
 ## Executive Summary
-[150–250 words. Summarise the most important developments, their strategic significance, and what decision-makers should prioritise. Separate confirmed facts from interpretation.]
+[400–600 words. Provide a thorough summary of the most important developments across all research pillars: funding, policy, fuel cell technology, stationary power, micro-grid and backup power, and intralogistics. Highlight strategic significance and what decision-makers should prioritise this week. Separate confirmed facts from interpretation. This section stands alone — a reader who reads only this section must come away fully informed.]
 
 ## Key Developments
-[4–7 bullet points. Each bullet: **Headline.** Source-backed fact. Strategic implication in one sentence.]
+[10–14 bullet points. Each bullet must follow this format exactly: **Headline.** One or two source-backed sentences with specific facts, figures, or company names where available. Strategic implication in one sentence. Cover all research pillars — do not cluster on a single theme.]
 
 ## Market Implications
-[2–4 short paragraphs. Market trends, sizing signals, demand shifts, competitive dynamics. Cite sources where possible.]
+[5–7 paragraphs. Cover market trends, sizing signals, demand shifts, and competitive dynamics across Europe. Devote at least one paragraph each to: (1) stationary and backup power demand, (2) intralogistics and material handling, (3) micro-grid and off-grid applications, (4) funding and investment flows. Cite sources where possible.]
 
 ## Technology Signals
-[Bullet points. Engineering advances, efficiency improvements, deployment milestones, R&D directions from the research.]
+[8–12 bullet points. Cover engineering advances, efficiency improvements, cost reductions, stack and system performance milestones, deployment results, and R&D directions from the research. Include specific figures or company names where available.]
 
 ## Policy and Funding Signals
-[Bullet points. Government programs, regulations, subsidies, funding announcements visible in the research. If none found, state that clearly.]
+[8–12 bullet points. Cover EU-level, national, and regional funding programs, regulatory updates, subsidies, grants, and strategy announcements visible in the research. Include amounts, timelines, and eligibility criteria where available. If a specific funding pillar has no new signals, state that explicitly.]
 
 ## Competitive Notes
-[Bullet points. Company announcements, partnerships, expansion activity, hiring signals from the research. If none found, state that clearly.]
+[8–12 bullet points. Cover company announcements, product launches, partnerships, expansion activity, contract wins, and strategic moves from the research. Organise by application area where possible — stationary power, intralogistics, backup/UPS, micro-grid. If a company appears in the research, include it here.]
 
 ## Risks and Watchouts
-[Bullet points. Supply chain risks, policy uncertainty, technology gaps, market risks visible in the research. Include at least two even if the research is limited.]
+[6–10 bullet points. Cover supply chain risks, policy uncertainty, technology gaps, cost barriers, market risks, and execution risks visible in the research. Include at least one risk per major application area. Be specific — generic risk statements are not acceptable.]
 
 ## Source Traceability
 [List every source that contributed to this report. Format exactly as:
@@ -98,14 +98,13 @@ Leave the "## Workflow Metadata" section body as a single line: [System-generate
 # ---------------------------------------------------------------------------
 
 def build_context(state: AgentState) -> tuple[str, int]:
-    """Build a compact research context string from the workflow state.
+    """Build a research context string from the workflow state.
 
-    Context is assembled in priority order:
-      0. RAG historical context — findings retrieved from Pinecone (previous runs)
-      1. Successfully crawled pages — highest signal quality (full content excerpt)
-      2. Merged search / news / RSS results — snippet-level signal
-
-    Total context is capped at _MAX_CONTEXT_CHARS to control token cost.
+    Priority order — highest value first so truncation cuts the least useful content:
+      1. RSS items — freshest real news from industry publications
+      2. Serper/NewsAPI snippets — current news after search_type="news" filtering
+      3. Crawled pages — full article content from non-blocklisted sources
+      4. RAG historical context — capped at 2 items, labelled clearly as background
 
     Returns:
         Tuple of (context_string, total_source_count_in_context)
@@ -113,35 +112,44 @@ def build_context(state: AgentState) -> tuple[str, int]:
     parts: list[str] = []
     source_count: int = 0
 
-    # --- Priority 0: RAG retrieved historical context (highest signal for trend continuity) ---
-    rag_context = state.get("rag_context", [])
-    if rag_context:
-        rag_parts: list[str] = []
-        for r in rag_context[:5]:
-            title = r.get("title", "") if isinstance(r, dict) else getattr(r, "title", "")
-            url = r.get("url", "") if isinstance(r, dict) else getattr(r, "url", "")
-            source = r.get("source", "") if isinstance(r, dict) else getattr(r, "source", "")
-            snippet = r.get("snippet", "") if isinstance(r, dict) else getattr(r, "snippet", "")
-            score = r.get("score", 0.0) if isinstance(r, dict) else getattr(r, "score", 0.0)
-            snippet_excerpt = (snippet or "")[:_MAX_SNIPPET_CHARS]
-            rag_parts.append(
-                f"[HISTORICAL | {source}] (relevance score: {score:.2f})\n"
-                f"Title: {title}\n"
-                f"URL: {url}\n"
-                f"{snippet_excerpt}"
-            )
-        if rag_parts:
-            historical_block = (
-                "=== HISTORICAL CONTEXT (retrieved from previous research runs) ===\n\n"
-                + "\n\n---\n\n".join(rag_parts)
-            )
-            parts.append(historical_block)
-            source_count += len(rag_parts)
-            logger.debug(
-                "build_context: added %d RAG results to context", len(rag_parts)
-            )
+    merged = state.get("merged_results", [])
+    crawled_urls: set[str] = {
+        r.get("url", "") for r in state.get("crawled_results", [])
+        if r.get("extraction_success")
+    }
 
-    # --- Priority 1: crawled pages with successful extraction ---
+    # --- Priority 1: RSS items (real industry news, no paywalls) ---
+    rss_items = [r for r in merged if r.get("source_type") == "rss" and r.get("url") not in crawled_urls]
+    for r in rss_items[:35]:
+        snippet = (r.get("snippet") or "")[:_MAX_SNIPPET_CHARS]
+        pub = r.get("published_at") or ""
+        parts.append(
+            f"[RSS | {r.get('source', '')}]\n"
+            f"Title: {r.get('title', '')}\n"
+            f"URL: {r.get('url', '')}\n"
+            f"Published: {pub}\n"
+            f"{snippet}"
+        )
+        source_count += 1
+
+    # --- Priority 2: Serper / NewsAPI news snippets ---
+    search_items = [
+        r for r in merged
+        if r.get("source_type") in ("organic", "news") and r.get("url") not in crawled_urls
+    ]
+    for r in search_items[:_MAX_MERGED_IN_CONTEXT]:
+        snippet = (r.get("snippet") or "")[:_MAX_SNIPPET_CHARS]
+        pub = r.get("published_at") or ""
+        parts.append(
+            f"[{r.get('source_type', '').upper()} | {r.get('source', '')}]\n"
+            f"Title: {r.get('title', '')}\n"
+            f"URL: {r.get('url', '')}\n"
+            f"Published: {pub}\n"
+            f"{snippet}"
+        )
+        source_count += 1
+
+    # --- Priority 3: Crawled pages (blocklist already applied upstream) ---
     for r in state.get("crawled_results", []):
         if not r.get("extraction_success"):
             continue
@@ -154,22 +162,28 @@ def build_context(state: AgentState) -> tuple[str, int]:
         )
         source_count += 1
 
-    # --- Priority 2: merged results (search + news + rss) ---
-    added_urls: set[str] = {r.get("url", "") for r in state.get("crawled_results", []) if r.get("extraction_success")}
-    for r in state.get("merged_results", [])[:_MAX_MERGED_IN_CONTEXT]:
-        url = r.get("url", "")
-        if url in added_urls:
-            continue  # already included via crawled content above
-        snippet = (r.get("snippet") or "")[:_MAX_SNIPPET_CHARS]
-        pub = r.get("published_at") or ""
-        parts.append(
-            f"[{r.get('source_type', '').upper()} | {r.get('source', '')}]\n"
-            f"Title: {r.get('title', '')}\n"
-            f"URL: {url}\n"
-            f"Published: {pub}\n"
-            f"{snippet}"
-        )
-        source_count += 1
+    # --- Priority 4: RAG historical — capped at 2, background context only ---
+    rag_context = state.get("rag_context", [])
+    if rag_context:
+        rag_parts: list[str] = []
+        for r in rag_context[:2]:
+            title = r.get("title", "") if isinstance(r, dict) else getattr(r, "title", "")
+            url = r.get("url", "") if isinstance(r, dict) else getattr(r, "url", "")
+            source = r.get("source", "") if isinstance(r, dict) else getattr(r, "source", "")
+            snippet = r.get("snippet", "") if isinstance(r, dict) else getattr(r, "snippet", "")
+            score = r.get("score", 0.0) if isinstance(r, dict) else getattr(r, "score", 0.0)
+            rag_parts.append(
+                f"[HISTORICAL BACKGROUND | {source}] (score: {score:.2f})\n"
+                f"Title: {title}\nURL: {url}\n"
+                f"{(snippet or '')[:_MAX_SNIPPET_CHARS]}"
+            )
+        if rag_parts:
+            parts.append(
+                "=== HISTORICAL BACKGROUND (for trend comparison only — not current news) ===\n\n"
+                + "\n\n---\n\n".join(rag_parts)
+            )
+            source_count += len(rag_parts)
+            logger.debug("build_context: added %d RAG items as background", len(rag_parts))
 
     context = "\n\n---\n\n".join(parts)
 
@@ -319,7 +333,7 @@ def generate_report(
     )
 
     logger.info(
-        "Report: calling OpenAI | prompt_chars=%d | max_tokens=3000",
+        "Report: calling OpenAI | prompt_chars=%d | max_tokens=6000",
         len(prompt),
     )
 
@@ -327,7 +341,7 @@ def generate_report(
     report_body = complete(
         prompt=prompt,
         system=_SYSTEM_PROMPT,
-        max_tokens=3000,
+        max_tokens=6000,
         temperature=0.2,
     )
 

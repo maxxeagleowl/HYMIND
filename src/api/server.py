@@ -78,7 +78,7 @@ def run_hymind_agent(topic: str, report_type: str, run_mode: str) -> dict:
     content = report_path.read_text(encoding="utf-8")
 
     # Extract report title from first H1 line
-    title = "HYMIND Executive Intelligence Report"
+    title = "HYMIND Weekly Intelligence Report"
     for line in content.splitlines():
         stripped = line.strip()
         if stripped.startswith("# "):

@@ -13,10 +13,12 @@ Node order:
 
 import os
 from datetime import datetime, timezone
+from urllib.parse import urlparse
 
 from langgraph.graph import END, START, StateGraph
 
-from tools.rss_reader import DEFAULT_HYDROGEN_FEEDS, read_feeds
+from config.research_topics import SERPER_QUERIES, NEWS_QUERIES, RSS_FEEDS
+from tools.rss_reader import read_feeds
 from tools.serper_search import search as serper_search
 from tools.news_api import search as news_search
 from tools.web_crawler import crawl_many
@@ -25,7 +27,30 @@ from workflows.state import AgentState
 
 logger = get_logger(__name__)
 
-_MAX_CRAWL_URLS: int = 5
+_MAX_CRAWL_URLS: int = 20
+
+# Domains that return paywalled, generic, or low-value market research landing pages.
+# Crawling these wastes budget and pollutes the report with "$X billion by 2030" boilerplate.
+_CRAWL_BLOCKLIST: frozenset[str] = frozenset({
+    "bccresearch.com",
+    "marketsandmarkets.com",
+    "marketresearchfuture.com",
+    "grandviewresearch.com",
+    "mordorintelligence.com",
+    "alliedmarketresearch.com",
+    "statista.com",
+    "ibisworld.com",
+    "precedenceresearch.com",
+    "reportlinker.com",
+    "transparencymarketresearch.com",
+    "fortunebusinessinsights.com",
+    "coherentmarketinsights.com",
+    "zionmarketresearch.com",
+    "futuremarketinsights.com",
+    "businesswire.com",
+    "prnewswire.com",
+    "globenewswire.com",
+})
 
 
 # ---------------------------------------------------------------------------
@@ -62,8 +87,8 @@ def initialize_state(state: AgentState) -> dict:
 
 
 def collect_serper(state: AgentState) -> dict:
-    """Run a Serper web search for the topic and store results in state."""
-    logger.info("=== Node START: collect_serper | topic=%r ===", state["topic"])
+    """Run Serper web searches across all configured research queries."""
+    logger.info("=== Node START: collect_serper | queries=%d ===", len(SERPER_QUERIES))
 
     if not os.getenv("SERPER_API_KEY", "").strip():
         logger.warning("collect_serper: SERPER_API_KEY not configured — source skipped")
@@ -73,22 +98,31 @@ def collect_serper(state: AgentState) -> dict:
             "warnings": ["collect_serper: SERPER_API_KEY not set — Serper skipped"],
         }
 
-    try:
-        results = serper_search(state["topic"])
-        logger.info("=== Node END: collect_serper | results=%d ===", len(results))
-        return {"serper_results": results}
-    except Exception as exc:
-        logger.error("collect_serper: failed | error_type=%s | error=%s", type(exc).__name__, exc)
-        logger.info("=== Node END: collect_serper | failed, continuing ===")
-        return {
-            "serper_results": [],
-            "errors": [f"collect_serper: {type(exc).__name__}: {exc}"],
-        }
+    all_results: list[dict] = []
+    errors: list[str] = []
+
+    for query in SERPER_QUERIES:
+        try:
+            results = serper_search(query, search_type="news")
+            all_results.extend(results)
+            logger.debug("collect_serper: query=%r | results=%d", query, len(results))
+        except Exception as exc:
+            logger.error("collect_serper: query=%r | error_type=%s | error=%s", query, type(exc).__name__, exc)
+            errors.append(f"collect_serper [{query}]: {type(exc).__name__}: {exc}")
+
+    logger.info(
+        "=== Node END: collect_serper | queries=%d | total_results=%d | errors=%d ===",
+        len(SERPER_QUERIES), len(all_results), len(errors),
+    )
+    result: dict = {"serper_results": all_results}
+    if errors:
+        result["errors"] = errors
+    return result
 
 
 def collect_news(state: AgentState) -> dict:
-    """Query NewsAPI for recent articles matching the topic."""
-    logger.info("=== Node START: collect_news | topic=%r ===", state["topic"])
+    """Query NewsAPI for recent articles across all configured news queries."""
+    logger.info("=== Node START: collect_news | queries=%d ===", len(NEWS_QUERIES))
 
     if not os.getenv("NEWS_API_KEY", "").strip():
         logger.warning("collect_news: NEWS_API_KEY not configured — source skipped")
@@ -98,24 +132,33 @@ def collect_news(state: AgentState) -> dict:
             "warnings": ["collect_news: NEWS_API_KEY not set — NewsAPI skipped"],
         }
 
-    try:
-        results = news_search(state["topic"])
-        logger.info("=== Node END: collect_news | results=%d ===", len(results))
-        return {"news_results": results}
-    except Exception as exc:
-        logger.error("collect_news: failed | error_type=%s | error=%s", type(exc).__name__, exc)
-        logger.info("=== Node END: collect_news | failed, continuing ===")
-        return {
-            "news_results": [],
-            "errors": [f"collect_news: {type(exc).__name__}: {exc}"],
-        }
+    all_results: list[dict] = []
+    errors: list[str] = []
+
+    for query in NEWS_QUERIES:
+        try:
+            results = news_search(query)
+            all_results.extend(results)
+            logger.debug("collect_news: query=%r | results=%d", query, len(results))
+        except Exception as exc:
+            logger.error("collect_news: query=%r | error_type=%s | error=%s", query, type(exc).__name__, exc)
+            errors.append(f"collect_news [{query}]: {type(exc).__name__}: {exc}")
+
+    logger.info(
+        "=== Node END: collect_news | queries=%d | total_results=%d | errors=%d ===",
+        len(NEWS_QUERIES), len(all_results), len(errors),
+    )
+    result: dict = {"news_results": all_results}
+    if errors:
+        result["errors"] = errors
+    return result
 
 
 def collect_rss(state: AgentState) -> dict:
     """Fetch entries from all configured hydrogen RSS feeds."""
-    logger.info("=== Node START: collect_rss | feeds=%d ===", len(DEFAULT_HYDROGEN_FEEDS))
+    logger.info("=== Node START: collect_rss | feeds=%d ===", len(RSS_FEEDS))
     try:
-        results = read_feeds(DEFAULT_HYDROGEN_FEEDS, topic=state["topic"])
+        results = read_feeds(RSS_FEEDS, topic=state["topic"])
         logger.info("=== Node END: collect_rss | results=%d ===", len(results))
         return {"rss_results": results}
     except Exception as exc:
@@ -171,6 +214,13 @@ def crawl_selected(state: AgentState) -> dict:
             continue
         if url.lower().endswith(".pdf"):
             logger.debug("crawl_selected: skipping PDF | url=%s", url)
+            continue
+        try:
+            domain = urlparse(url).netloc.lower().removeprefix("www.")
+        except Exception:
+            domain = ""
+        if any(domain == b or domain.endswith("." + b) for b in _CRAWL_BLOCKLIST):
+            logger.debug("crawl_selected: skipping blocklisted domain | domain=%s | url=%s", domain, url)
             continue
         urls.append(url)
         if len(urls) >= _MAX_CRAWL_URLS:

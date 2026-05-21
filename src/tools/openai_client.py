@@ -18,9 +18,9 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-_TIMEOUT: int = 30
+_TIMEOUT: int = 240
 _MAX_RETRIES: int = 3
-_DEFAULT_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+_DEFAULT_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o")
 
 _client: Optional[OpenAI] = None
 
