@@ -171,8 +171,15 @@ def collect_rss(state: AgentState) -> dict:
 
 
 def merge_and_deduplicate(state: AgentState) -> dict:
-    """Combine all source results and remove duplicates by normalised URL."""
+    """Combine all source results and remove duplicates by normalised URL.
+
+    Two deduplication passes:
+      1. Within this run — URL-keyed set (fast, in-memory).
+      2. Cross-run — SQLite seen_urls DB (filters articles collected in prior runs).
+    """
     logger.info("=== Node START: merge_and_deduplicate ===")
+
+    from utils.url_tracker import filter_new
 
     all_results: list[dict] = (
         state.get("serper_results", [])
@@ -180,9 +187,9 @@ def merge_and_deduplicate(state: AgentState) -> dict:
         + state.get("rss_results", [])
     )
 
+    # Pass 1: deduplicate within this run
     seen: set[str] = set()
     deduplicated: list[dict] = []
-
     for item in all_results:
         url = item.get("url", "")
         if not url:
@@ -192,13 +199,27 @@ def merge_and_deduplicate(state: AgentState) -> dict:
             seen.add(key)
             deduplicated.append(item)
 
+    in_run_removed = len(all_results) - len(deduplicated)
+
+    # Pass 2: filter URLs already seen in previous runs
+    new_results, cross_run_skipped = filter_new(deduplicated)
+
     logger.info(
-        "=== Node END: merge_and_deduplicate | total=%d | unique=%d | removed=%d ===",
+        "=== Node END: merge_and_deduplicate | total=%d | unique=%d"
+        " | in_run_dupes=%d | cross_run_skipped=%d | final=%d ===",
         len(all_results),
         len(deduplicated),
-        len(all_results) - len(deduplicated),
+        in_run_removed,
+        cross_run_skipped,
+        len(new_results),
     )
-    return {"merged_results": deduplicated}
+
+    result: dict = {"merged_results": new_results}
+    if cross_run_skipped:
+        result["warnings"] = [
+            f"merge_and_deduplicate: {cross_run_skipped} URLs skipped (seen in previous runs)"
+        ]
+    return result
 
 
 def crawl_selected(state: AgentState) -> dict:
@@ -321,7 +342,7 @@ def retrieve_context_from_pinecone(state: AgentState) -> dict:
 
 
 def finalize_state(state: AgentState) -> dict:
-    """Compute final run_metadata counters and elapsed duration."""
+    """Compute final run_metadata counters, elapsed duration, and persist seen URLs."""
     logger.info("=== Node START: finalize_state ===")
 
     meta: dict = state.get("run_metadata", {})
@@ -353,6 +374,10 @@ def finalize_state(state: AgentState) -> dict:
         "error_count": len(errors),
         "warning_count": len(state.get("warnings", [])),
     }
+
+    # Persist the newly collected URLs so they are skipped in future runs
+    from utils.url_tracker import mark_seen
+    mark_seen(state.get("merged_results", []))
 
     if errors:
         logger.warning("finalize_state: %d pipeline errors recorded", len(errors))

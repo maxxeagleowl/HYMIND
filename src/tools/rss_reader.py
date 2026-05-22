@@ -4,8 +4,10 @@ Result schema matches serper_search.py and news_api.py so outputs from all three
 tools can be merged into a single list by downstream workflow nodes.
 """
 
+import calendar
 import logging
 import re
+import time
 from urllib.parse import urlparse
 
 import feedparser
@@ -27,6 +29,8 @@ _MAX_RETRIES: int = 2
 _RETRY_WAIT: int = 3
 _USER_AGENT: str = "HYMIND/0.1 (hydrogen market intelligence)"
 
+_MAX_ARTICLE_AGE_DAYS: int = 14
+
 _HTML_TAG_RE = re.compile(r"<[^>]+>")
 _WHITESPACE_RE = re.compile(r"\s+")
 
@@ -40,6 +44,21 @@ DEFAULT_HYDROGEN_FEEDS: list[str] = [
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
+
+def _is_too_old(entry: feedparser.FeedParserDict) -> bool:
+    """Return True if the entry is older than _MAX_ARTICLE_AGE_DAYS.
+
+    Entries without a parseable date are kept (we cannot determine their age).
+    """
+    parsed_time = entry.get("published_parsed") or entry.get("updated_parsed")
+    if parsed_time is None:
+        return False
+    try:
+        age_seconds = time.time() - calendar.timegm(parsed_time)
+        return age_seconds > _MAX_ARTICLE_AGE_DAYS * 86_400
+    except Exception:
+        return False
+
 
 def _strip_html(text: str) -> str:
     """Remove HTML tags and collapse whitespace from a text string."""
@@ -176,6 +195,18 @@ def read_feed(
 
     if max_entries is not None:
         entries = entries[:max_entries]
+
+    # --- Age filter ---
+    fresh = [e for e in entries if not _is_too_old(e)]
+    stale = len(entries) - len(fresh)
+    if stale:
+        logger.info(
+            "RSS age filter: dropped %d entries older than %d days | url=%s",
+            stale,
+            _MAX_ARTICLE_AGE_DAYS,
+            url,
+        )
+    entries = fresh
 
     # --- Normalize ---
     results: list[dict] = []

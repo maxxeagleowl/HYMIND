@@ -29,6 +29,7 @@ HYMIND collects external market, technology, policy, and competitor signals from
 | Pillar-organized Serper queries (15) + NewsAPI queries (9) | 7 | Done |
 | Crawl blocklist (18 low-value market research domains) | 7 | Done |
 | Upgraded report prompts (European H2 + fuel cell focus) | 7 | Done |
+| Cross-run URL deduplication (`src/utils/url_tracker.py`) | 7 | Done |
 
 ---
 
@@ -91,11 +92,11 @@ The core LangGraph pipeline ends at Markdown report generation. The Phase 5 dist
 | 2 | `collect_serper` | Queries Serper for organic and news search results |
 | 3 | `collect_news` | Queries NewsAPI for recent articles |
 | 4 | `collect_rss` | Fetches entries from configured hydrogen RSS feeds |
-| 5 | `merge_and_deduplicate` | Combines all sources, deduplicates by normalised URL |
+| 5 | `merge_and_deduplicate` | Combines all sources, deduplicates within-run by URL, then filters URLs already seen in previous runs via `url_tracker` |
 | 6 | `crawl_selected` | Crawls up to 20 non-PDF, non-blocklisted URLs for full article content |
 | 7 | `store_findings_in_pinecone` | Embeds merged findings and upserts to Pinecone (skipped if not configured) |
 | 8 | `retrieve_context_from_pinecone` | Retrieves top-5 semantically similar historical findings (skipped if not configured) |
-| 9 | `finalize_state` | Computes counts, duration, and error summary |
+| 9 | `finalize_state` | Computes counts, duration, error summary, and persists merged result URLs to the seen-URL store |
 | 10 | `generate_report` | Builds context (including RAG history), calls OpenAI, saves Markdown report |
 
 All collection nodes (steps 2–4) fail gracefully: a missing API key or network error appends to the `errors` or `warnings` list and the pipeline continues with partial results.
@@ -166,6 +167,7 @@ If `PINECONE_API_KEY` or `OPENAI_API_KEY` is absent, both RAG nodes emit a warni
 - **Tenacity retry**: all external HTTP calls retry on `Timeout`, `ConnectionError`, HTTP 429, and HTTP 5xx with exponential back-off
 - **Output validation layer**: `validate_findings()` removes URL-absent and duplicate entries before report synthesis; `check_state_quality()` assesses state completeness
 - **URL deduplication**: merged results are deduplicated by normalised URL (lowercase, trailing-slash stripped) before crawling
+- **Cross-run deduplication**: `url_tracker.py` prevents the same articles from being processed in subsequent runs — Pinecone vector IDs are checked by `fetch()` (no embedding cost) as the primary path; SQLite (`data/seen_urls.db`) is the fallback when Pinecone is not configured; newly collected URLs are persisted at `finalize_state`
 - **PDF pre-filtering**: PDF URLs are excluded from the crawl queue automatically
 - **Boilerplate removal**: web crawler strips `script`, `style`, `nav`, `footer`, `header`, `aside`, `form`, and `iframe` before text extraction
 - **JS-rendered site detection**: crawler returns `extraction_success=False` for shell HTML pages and continues
@@ -443,7 +445,8 @@ HYMIND/
 │   │   ├── report_generator.py   # OpenAI report synthesis (includes RAG context)
 │   │   └── validator.py          # Output validation layer (Phase 4)
 │   ├── utils/
-│   │   └── logger.py             # Shared structured logger
+│   │   ├── logger.py             # Shared structured logger
+│   │   └── url_tracker.py        # Cross-run URL deduplication (Pinecone / SQLite)
 │   └── main.py                   # CLI entry point
 ├── n8n/
 │   ├── HYMIND.json               # Main n8n workflow (Schedule → HTTP → Gmail)
@@ -463,6 +466,8 @@ HYMIND/
 ├── outputs/
 │   ├── reports/                  # Generated Markdown reports (gitignored, kept by pattern)
 │   └── sample_reports/           # 3 example reports included in repo
+├── data/
+│   └── seen_urls.db              # SQLite URL-seen store (gitignored; created on first run)
 ├── tests/                        # 243-test automated suite
 ├── scripts/
 │   └── run_api.py                # uvicorn convenience start script
