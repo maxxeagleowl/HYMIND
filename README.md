@@ -58,8 +58,13 @@ flowchart TD
         T4[web_crawler.py\nrequests + BeautifulSoup]
     end
 
+    subgraph Storage["Persistence Layer"]
+        S1[Pinecone\nVector Store]
+        S2[SQLite\ndata/seen_urls.db\nURL dedup fallback]
+    end
+
     subgraph Report["Report Generation"]
-        R1[report_generator.py\nOpenAI GPT-4o-mini]
+        R1[report_generator.py\nOpenAI gpt-4o default]
         R2[outputs/reports/\nMarkdown Executive Report]
     end
 
@@ -73,6 +78,12 @@ flowchart TD
     N3 -. calls .-> T2
     N4 -. calls .-> T3
     N6 -. calls .-> T4
+    N5 -. URL dedup .-> S1
+    N5 -. URL dedup fallback .-> S2
+    N7 -. upserts findings .-> S1
+    N8 -. queries context .-> S1
+    N9 -. persists seen URLs .-> S1
+    N9 -. persists seen URLs fallback .-> S2
     WF --> R1
     R1 --> R2
     R2 --> D1
@@ -97,7 +108,7 @@ The core LangGraph pipeline ends at Markdown report generation. The Phase 5 dist
 | 7 | `store_findings_in_pinecone` | Embeds merged findings and upserts to Pinecone (skipped if not configured) |
 | 8 | `retrieve_context_from_pinecone` | Retrieves top-5 semantically similar historical findings (skipped if not configured) |
 | 9 | `finalize_state` | Computes counts, duration, error summary, and persists merged result URLs to the seen-URL store |
-| 10 | `generate_report` | Builds context (including RAG history), calls OpenAI, saves Markdown report |
+| — | `generate_report` *(called after pipeline)* | Builds context from state, calls OpenAI, appends programmatic metadata, saves Markdown report |
 
 All collection nodes (steps 2–4) fail gracefully: a missing API key or network error appends to the `errors` or `warnings` list and the pipeline continues with partial results.
 
@@ -181,16 +192,15 @@ If `PINECONE_API_KEY` or `OPENAI_API_KEY` is absent, both RAG nodes emit a warni
 
 Each generated report (`outputs/reports/YYYYMMDD_HHMMSS_hymind_report.md`) contains:
 
-1. **Research Topic** — scope statement
-2. **Executive Summary** — 150–250 word strategic brief
-3. **Key Developments** — source-backed bullet points
-4. **Market Implications** — trend and demand analysis
-5. **Technology Signals** — engineering and deployment signals
-6. **Policy and Funding Signals** — government programs and regulations
-7. **Competitive Notes** — company activity visible in research
-8. **Risks and Watchouts** — identified uncertainties and gaps
-9. **Source Traceability** — all contributing URLs with type labels
-10. **Workflow Metadata** — pipeline statistics table (programmatically generated)
+1. **Executive Summary** — 300–450 word strategic brief across all research pillars
+2. **Key Developments** — 10–14 source-backed bullet points
+3. **Market Implications** — trend and demand analysis (5–7 paragraphs)
+4. **Technology Signals** — engineering and deployment signals
+5. **Policy and Funding Signals** — government programs and regulations
+6. **Competitive Notes** — company activity visible in research
+7. **Risks and Watchouts** — identified uncertainties and gaps
+8. **Source Traceability** — all contributing URLs with type labels
+9. **Workflow Metadata** — pipeline statistics table (programmatically generated, never passed to LLM)
 
 Sample reports are available in `outputs/sample_reports/`.
 
@@ -202,7 +212,7 @@ Sample reports are available in `outputs/sample_reports/`.
 |---|---|---|
 | Language | Python 3.11+ | Core implementation |
 | Agent framework | LangGraph 1.x | State machine workflow orchestration |
-| LLM | OpenAI GPT-5.1 | Research synthesis and report generation |
+| LLM | OpenAI (default `gpt-4o`; override via `OPENAI_MODEL`) | Research synthesis and report generation |
 | Web search | Serper API | Google search results |
 | News | NewsAPI | News article retrieval |
 | RSS | feedparser + requests | Hydrogen industry feed ingestion |
@@ -241,7 +251,7 @@ Copy-Item .env.example .env
 
 ```env
 OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-5.1
+OPENAI_MODEL=gpt-4o
 OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 
 SERPER_API_KEY=...

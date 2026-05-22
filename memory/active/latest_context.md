@@ -2,9 +2,9 @@
 
 ## Current State
 
-**Phase 6 — Documentation and Submission Finalization — In Progress**
+**Phase 7 — Search & Prompt Hardening + Cross-Run Deduplication — Complete**
 
-Phase 6 documentation pass completed. All major documentation gaps closed.
+Phase 6 finalized; Phase 7 complete. Full consistency audit performed across all docs, README, and code.
 
 ## Phase 6 Changes (2026-05-20)
 
@@ -48,11 +48,30 @@ Phase 6 documentation pass completed. All major documentation gaps closed.
 - `src/hymind/` nesting removed — all modules directly under `src/`
 - 243 tests pass
 
+## Phase 7 Changes (2026-05-22)
+
+| File | Change |
+|---|---|
+| `src/config/research_topics.py` | 15 Serper queries, 9 NewsAPI queries, 6 RSS feeds, 18-domain crawl blocklist |
+| `src/reporting/report_generator.py` | Upgraded prompts: McKinsey-style rules, 300–450 word Executive Summary, 9 explicit sections |
+| `src/utils/url_tracker.py` | Cross-run URL dedup — Pinecone fetch-by-ID primary, SQLite fallback |
+| `src/workflows/research_workflow.py` | Two-pass dedup in merge_and_deduplicate; mark_seen in finalize_state |
+| `src/tools/rss_reader.py` | Minor timing fixes |
+
+## Consistency Audit Fixes (2026-05-22)
+
+| Fix | Files |
+|---|---|
+| Model name `gpt-5.1` → `gpt-4o` (matches code default) | README.md, .env.example |
+| Mermaid diagram model label corrected | README.md |
+| Report sections: 10 → 9 (no "Research Topic" section in code) | README.md |
+| Executive Summary: 150–250 → 300–450 words (matches code prompt) | README.md |
+| `generate_report` labelled as post-pipeline call, not a LangGraph node | README.md |
+| `fpdf2` removed from dependencies (PDF descoped in Phase 5) | pyproject.toml |
+| Phase status: Phase 6 Complete, Phase 7 added | docs/project_state.md |
+| Docs tree: `architecture.md`→`system_architecture.md`, `workflow.md`→`research_pipeline.md` | docs/project_state.md |
+| url_tracker and data/seen_urls.db added to repo layout | README.md |
+
 ## Operational Focus
 
-Phase 6 is in progress. Remaining items:
-- Final submission review
-- Verify no secrets in committed files
-- Confirm `.gitignore` is correct
-- Consider adding `pyproject.toml` cleanup (remove `fpdf2` since PDF was descoped)
-- Git commit of all Phase 6 changes
+All phases complete. Repository is in clean, consistent state ready for commit.

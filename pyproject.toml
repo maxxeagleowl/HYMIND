@@ -17,7 +17,6 @@ dependencies = [
     "beautifulsoup4",
     "lxml",
     "markdown",
-    "fpdf2",
     "pydantic",
     "tenacity",
     "rich",
