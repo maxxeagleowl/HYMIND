@@ -6,7 +6,7 @@ HYMIND collects external market, technology, policy, and competitor signals from
 
 ---
 
-## Current Status — Phase 1–5 Complete
+## Current Status — Phase 1–7 Complete
 
 | Capability | Phase | Status |
 |---|---|---|
@@ -24,8 +24,11 @@ HYMIND collects external market, technology, policy, and competitor signals from
 | FastAPI HTTP wrapper | 5 | Done |
 | n8n scheduled workflow + Gmail delivery | 5 | Done |
 | Google Sheets delivery logging | 5 | Done |
-
-Phase 6 is Documentation, Demo and Project Finalization (current phase).
+| README finalization + architecture documentation | 6 | Done |
+| Centralized search query config (`src/config/research_topics.py`) | 7 | Done |
+| Pillar-organized Serper queries (15) + NewsAPI queries (9) | 7 | Done |
+| Crawl blocklist (18 low-value market research domains) | 7 | Done |
+| Upgraded report prompts (European H2 + fuel cell focus) | 7 | Done |
 
 ---
 
@@ -89,7 +92,7 @@ The core LangGraph pipeline ends at Markdown report generation. The Phase 5 dist
 | 3 | `collect_news` | Queries NewsAPI for recent articles |
 | 4 | `collect_rss` | Fetches entries from configured hydrogen RSS feeds |
 | 5 | `merge_and_deduplicate` | Combines all sources, deduplicates by normalised URL |
-| 6 | `crawl_selected` | Crawls top 5 non-PDF URLs for full article content |
+| 6 | `crawl_selected` | Crawls up to 20 non-PDF, non-blocklisted URLs for full article content |
 | 7 | `store_findings_in_pinecone` | Embeds merged findings and upserts to Pinecone (skipped if not configured) |
 | 8 | `retrieve_context_from_pinecone` | Retrieves top-5 semantically similar historical findings (skipped if not configured) |
 | 9 | `finalize_state` | Computes counts, duration, and error summary |
@@ -197,7 +200,7 @@ Sample reports are available in `outputs/sample_reports/`.
 |---|---|---|
 | Language | Python 3.11+ | Core implementation |
 | Agent framework | LangGraph 1.x | State machine workflow orchestration |
-| LLM | OpenAI GPT-4o-mini | Research synthesis and report generation |
+| LLM | OpenAI GPT-5.1 | Research synthesis and report generation |
 | Web search | Serper API | Google search results |
 | News | NewsAPI | News article retrieval |
 | RSS | feedparser + requests | Hydrogen industry feed ingestion |
@@ -236,7 +239,7 @@ Copy-Item .env.example .env
 
 ```env
 OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini
+OPENAI_MODEL=gpt-5.1
 OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 
 SERPER_API_KEY=...
@@ -251,12 +254,16 @@ PINECONE_INDEX_NAME=hymind-research
 PINECONE_CLOUD=aws
 PINECONE_REGION=us-east-1
 
+# Output directories
+REPORT_OUTPUT_DIR=outputs
+REPORT_ARCHIVE_DIR=reports
+
 # Optional — API server authentication (Phase 5)
 HYMIND_API_KEY=
 
 LOG_LEVEL=INFO
-MAX_SEARCH_RESULTS=10
-MAX_ARTICLES_PER_RUN=10
+MAX_SEARCH_RESULTS=15
+MAX_ARTICLES_PER_RUN=15
 ```
 
 ### Pinecone Setup (optional — Phase 3 RAG)
@@ -415,6 +422,8 @@ HYMIND/
 ├── src/
 │   ├── api/
 │   │   └── server.py             # FastAPI wrapper (Phase 5)
+│   ├── config/
+│   │   └── research_topics.py    # Serper queries, NewsAPI queries, RSS feeds (Phase 7)
 │   ├── tools/
 │   │   ├── openai_client.py      # OpenAI wrapper with retry
 │   │   ├── serper_search.py      # Serper web search

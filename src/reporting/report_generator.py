@@ -57,15 +57,13 @@ Report Date: {date}
 --- END RESEARCH CONTEXT ---
 
 Generate a complete structured Markdown executive intelligence report using EXACTLY the section headers below.
-Do not add or remove sections. Do not add commentary outside the sections.
+Do not add or remove sections. Do not add any title or heading above "## Executive Summary". Do not add commentary outside the sections.
 Leave the "## Workflow Metadata" section body as a single line: [System-generated]
 
 Write in depth. Each section must be substantive — executives use this report as their primary weekly briefing on the European hydrogen and fuel cell industry. Short or thin sections are not acceptable.
 
-# HYMIND [brief topic phrase — 4–8 words, no punctuation, starting with "Weekly"]
-
 ## Executive Summary
-[400–600 words. Provide a thorough summary of the most important developments across all research pillars: funding, policy, fuel cell technology, stationary power, micro-grid and backup power, and intralogistics. Highlight strategic significance and what decision-makers should prioritise this week. Separate confirmed facts from interpretation. This section stands alone — a reader who reads only this section must come away fully informed.]
+[300–450 words. Provide a thorough summary of the most important developments across all research pillars: funding, policy, fuel cell technology, stationary power, micro-grid and backup power, and intralogistics. Highlight strategic significance and what decision-makers should prioritise this week. Separate confirmed facts from interpretation. This section stands alone — a reader who reads only this section must come away fully informed.]
 
 ## Key Developments
 [10–14 bullet points. Each bullet must follow this format exactly: **Headline.** One or two source-backed sentences with specific facts, figures, or company names where available. Strategic implication in one sentence. Cover all research pillars — do not cluster on a single theme.]
@@ -346,6 +344,13 @@ def generate_report(
     )
 
     logger.info("Report: OpenAI response received | response_chars=%d", len(report_body))
+
+    # --- Prepend fixed title (never delegated to the LLM) ---
+    _REPORT_HEADER = (
+        "# Weekly Hydrogen and Fuel Cell Market Intelligence\n"
+        "HYMIND - Autonomous Hydrogen Market Intell & Data Agent\n\n"
+    )
+    report_body = _REPORT_HEADER + report_body.lstrip()
 
     # --- Replace the [System-generated] placeholder with real metadata ---
     # Save first so the path is available for the metadata section footer.
